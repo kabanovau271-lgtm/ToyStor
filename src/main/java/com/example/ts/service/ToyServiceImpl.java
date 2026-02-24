@@ -6,7 +6,6 @@ import com.example.ts.dto.ToyResponseDto;
 import com.example.ts.mapper.ToyMapper;
 import com.example.ts.repository.ToyRepository;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 @Service
