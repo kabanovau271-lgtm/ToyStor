@@ -24,7 +24,6 @@ jobs:
           distribution: 'zulu'
 
       - name: Build and analyze
-        working-directory: TS
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=kabanovau271-lgtm_ToyStor
