@@ -86,6 +86,29 @@ class ToyControllerTest {
   }
 
   @Test
+  void shouldUpdateToy() throws Exception {
+    ToyRequestDto request = new ToyRequestDto();
+    request.setName("Updated");
+    request.setBrand("Brand");
+    request.setPrice(200.0);
+
+    ToyResponseDto response = new ToyResponseDto();
+    response.setId(1L);
+    response.setName("Updated");
+    response.setBrand("Brand");
+    response.setPrice(200.0);
+
+    Mockito.when(toyService.updateToy(Mockito.eq(1L), Mockito.any()))
+        .thenReturn(response);
+
+    mockMvc.perform(put("/api/toys/1")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request)))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.name").value("Updated"));
+  }
+
+  @Test
   void shouldDeleteToy() throws Exception {
     mockMvc.perform(delete("/api/toys/1"))
         .andExpect(status().isOk());
