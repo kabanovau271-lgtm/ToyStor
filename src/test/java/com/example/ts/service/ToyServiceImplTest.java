@@ -7,9 +7,10 @@ import com.example.ts.mapper.ToyMapper;
 import com.example.ts.repository.ToyRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+
 import java.util.List;
 import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -25,17 +26,9 @@ class ToyServiceImplTest {
         mapper = mock(ToyMapper.class);
         service = new ToyServiceImpl(repository, mapper);
     }
-@Test
-void updateToy_shouldThrowException_whenToyNotFound() {
-    ToyRequestDto dto = new ToyRequestDto();
 
-    when(repository.findById(1L)).thenReturn(Optional.empty());
-
-    assertThrows(RuntimeException.class,
-            () -> service.updateToy(1L, dto));
-}
     @Test
-    void getAllToys_shouldReturnList() {
+    void getAllToys_shouldReturnMappedList() {
         Toy toy = new Toy();
         ToyResponseDto dto = new ToyResponseDto();
 
@@ -46,20 +39,9 @@ void updateToy_shouldThrowException_whenToyNotFound() {
 
         assertEquals(1, result.size());
         verify(repository).findAll();
+        verify(mapper).toDto(toy);
     }
-@Test
-void getToysByName_shouldReturnList() {
-    Toy toy = new Toy();
-    ToyResponseDto dto = new ToyResponseDto();
 
-    when(repository.findByName("Car")).thenReturn(List.of(toy));
-    when(mapper.toDto(toy)).thenReturn(dto);
-
-    List<ToyResponseDto> result = service.getToysByName("Car");
-
-    assertEquals(1, result.size());
-    verify(repository).findByName("Car");
-}
     @Test
     void getToyById_shouldReturnToy() {
         Toy toy = new Toy();
@@ -70,22 +52,36 @@ void getToysByName_shouldReturnList() {
 
         ToyResponseDto result = service.getToyById(1L);
 
-        assertNotNull(result);
+        assertEquals(dto, result);
         verify(repository).findById(1L);
+        verify(mapper).toDto(toy);
     }
 
     @Test
-    void getToyById_shouldThrowException() {
+    void getToyById_shouldThrowException_whenNotFound() {
         when(repository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(RuntimeException.class,
-                () -> service.getToyById(1L));
+        assertThrows(IllegalArgumentException.class,
+            () -> service.getToyById(1L));
     }
 
+    @Test
+    void getToysByName_shouldReturnMappedList() {
+        Toy toy = new Toy();
+        ToyResponseDto dto = new ToyResponseDto();
 
+        when(repository.findByName("Car")).thenReturn(List.of(toy));
+        when(mapper.toDto(toy)).thenReturn(dto);
+
+        List<ToyResponseDto> result = service.getToysByName("Car");
+
+        assertEquals(1, result.size());
+        verify(repository).findByName("Car");
+        verify(mapper).toDto(toy);
+    }
 
     @Test
-    void createToy_shouldSaveToy() {
+    void createToy_shouldMapAndSave() {
         ToyRequestDto request = new ToyRequestDto();
         Toy toy = new Toy();
         ToyResponseDto response = new ToyResponseDto();
@@ -96,12 +92,14 @@ void getToysByName_shouldReturnList() {
 
         ToyResponseDto result = service.createToy(request);
 
-        assertNotNull(result);
+        assertEquals(response, result);
+        verify(mapper).toEntity(request);
         verify(repository).save(toy);
+        verify(mapper).toDto(toy);
     }
 
     @Test
-    void updateToy_shouldUpdateFields() {
+    void updateToy_shouldUpdateFieldsAndSave() {
         Toy toy = new Toy();
         ToyRequestDto dto = new ToyRequestDto();
         dto.setName("New");
@@ -113,10 +111,22 @@ void getToysByName_shouldReturnList() {
         when(repository.save(toy)).thenReturn(toy);
         when(mapper.toDto(toy)).thenReturn(new ToyResponseDto());
 
-        ToyResponseDto result = service.updateToy(1L, dto);
+        service.updateToy(1L, dto);
 
         assertEquals("New", toy.getName());
+        assertEquals("Brand", toy.getBrand());
+        assertEquals(100.0, toy.getPrice());
+        assertEquals(5, toy.getQuantity());
+
         verify(repository).save(toy);
+    }
+
+    @Test
+    void updateToy_shouldThrowException_whenNotFound() {
+        when(repository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(IllegalArgumentException.class,
+            () -> service.updateToy(1L, new ToyRequestDto()));
     }
 
     @Test

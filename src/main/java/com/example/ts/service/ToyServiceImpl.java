@@ -30,7 +30,7 @@ public class ToyServiceImpl implements ToyService {
   @Override
   public ToyResponseDto getToyById(Long id) {
     Toy toy = repository.findById(id)
-        .orElseThrow(() -> new RuntimeException("Toy not found"));
+        .orElseThrow(() -> new IllegalArgumentException("Toy not found"));
     return mapper.toDto(toy);
   }
 
@@ -52,7 +52,7 @@ public class ToyServiceImpl implements ToyService {
   @Override
   public ToyResponseDto updateToy(Long id, ToyRequestDto dto) {
     Toy toy = repository.findById(id)
-        .orElseThrow(() -> new RuntimeException("Toy not found"));
+        .orElseThrow(() -> new IllegalArgumentException("Toy not found"));
 
     toy.setName(dto.getName());
     toy.setBrand(dto.getBrand());
