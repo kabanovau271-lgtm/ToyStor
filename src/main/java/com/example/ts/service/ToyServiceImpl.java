@@ -30,7 +30,7 @@ public class ToyServiceImpl implements ToyService {
   @Override
   public ToyResponseDto getToyById(Long id) {
     Toy toy = repository.findById(id)
-        .orElseThrow(() -> new IllegalArgumentException("Toy not found"));
+        .orElseThrow(this::toyNotFound);
     return mapper.toDto(toy);
   }
 
@@ -42,7 +42,6 @@ public class ToyServiceImpl implements ToyService {
         .toList();
   }
 
-
   @Override
   public ToyResponseDto createToy(ToyRequestDto dto) {
     Toy toy = mapper.toEntity(dto);
@@ -52,7 +51,7 @@ public class ToyServiceImpl implements ToyService {
   @Override
   public ToyResponseDto updateToy(Long id, ToyRequestDto dto) {
     Toy toy = repository.findById(id)
-        .orElseThrow(() -> new IllegalArgumentException("Toy not found"));
+        .orElseThrow(this::toyNotFound);
 
     toy.setName(dto.getName());
     toy.setBrand(dto.getBrand());
@@ -65,5 +64,9 @@ public class ToyServiceImpl implements ToyService {
   @Override
   public void deleteToy(Long id) {
     repository.deleteById(id);
+  }
+
+  private IllegalArgumentException toyNotFound() {
+    return new IllegalArgumentException("Toy not found");
   }
 }
