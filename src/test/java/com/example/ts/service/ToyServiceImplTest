@@ -25,7 +25,15 @@ class ToyServiceImplTest {
         mapper = mock(ToyMapper.class);
         service = new ToyServiceImpl(repository, mapper);
     }
+@Test
+void updateToy_shouldThrowException_whenToyNotFound() {
+    ToyRequestDto dto = new ToyRequestDto();
 
+    when(repository.findById(1L)).thenReturn(Optional.empty());
+
+    assertThrows(RuntimeException.class,
+            () -> service.updateToy(1L, dto));
+}
     @Test
     void getAllToys_shouldReturnList() {
         Toy toy = new Toy();
@@ -39,7 +47,19 @@ class ToyServiceImplTest {
         assertEquals(1, result.size());
         verify(repository).findAll();
     }
+@Test
+void getToysByName_shouldReturnList() {
+    Toy toy = new Toy();
+    ToyResponseDto dto = new ToyResponseDto();
 
+    when(repository.findByName("Car")).thenReturn(List.of(toy));
+    when(mapper.toDto(toy)).thenReturn(dto);
+
+    List<ToyResponseDto> result = service.getToysByName("Car");
+
+    assertEquals(1, result.size());
+    verify(repository).findByName("Car");
+}
     @Test
     void getToyById_shouldReturnToy() {
         Toy toy = new Toy();
