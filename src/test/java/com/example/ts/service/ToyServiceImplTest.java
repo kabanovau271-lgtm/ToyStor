@@ -125,8 +125,10 @@ class ToyServiceImplTest {
     void updateToy_shouldThrowException_whenNotFound() {
         when(repository.findById(1L)).thenReturn(Optional.empty());
 
+        ToyRequestDto dto = new ToyRequestDto();
+
         assertThrows(IllegalArgumentException.class,
-            () -> service.updateToy(1L, new ToyRequestDto()));
+            () -> service.updateToy(1L, dto));
     }
 
     @Test
