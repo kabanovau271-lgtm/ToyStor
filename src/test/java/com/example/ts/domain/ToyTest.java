@@ -15,6 +15,7 @@ class ToyTest {
     toy.setPrice(100.0);
     toy.setQuantity(5);
 
+
     assertEquals(1L, toy.getId());
     assertEquals("Car", toy.getName());
     assertEquals("Brand", toy.getBrand());
