@@ -21,6 +21,7 @@ class ToyDtoTest {
     assertEquals(2, dto.getQuantity());
   }
 
+
   @Test
   void responseDto_gettersAndSetters_shouldWork() {
     ToyResponseDto dto = new ToyResponseDto();
