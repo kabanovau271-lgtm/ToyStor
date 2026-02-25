@@ -8,6 +8,7 @@ import com.example.ts.repository.ToyRepository;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
+
 @Service
 public class ToyServiceImpl implements ToyService {
 
