@@ -11,7 +11,6 @@ public class ToyMapper {
   public Toy toEntity(ToyRequestDto dto) {
     Toy toy = new Toy();
     toy.setName(dto.getName());
-    toy.setBrand(dto.getBrand());
     toy.setPrice(dto.getPrice());
     toy.setQuantity(dto.getQuantity());
     return toy;
@@ -21,7 +20,6 @@ public class ToyMapper {
     ToyResponseDto dto = new ToyResponseDto();
     dto.setId(toy.getId());
     dto.setName(toy.getName());
-    dto.setBrand(toy.getBrand());
     dto.setPrice(toy.getPrice());
     dto.setQuantity(toy.getQuantity());
     return dto;

@@ -55,7 +55,6 @@ public class ToyServiceImpl implements ToyService {
         .orElseThrow(this::toyNotFound);
 
     toy.setName(dto.getName());
-    toy.setBrand(dto.getBrand());
     toy.setPrice(dto.getPrice());
     toy.setQuantity(dto.getQuantity());
 
