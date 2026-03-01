@@ -32,7 +32,7 @@ class ToyMapperTest {
     Toy toy = new Toy();
     toy.setId(1L);
     toy.setName("Car");
-    toy.setBrand("Brand");
+    // toy.setBrand("Brand");
     toy.setPrice(100.0);
     toy.setQuantity(5);
 
