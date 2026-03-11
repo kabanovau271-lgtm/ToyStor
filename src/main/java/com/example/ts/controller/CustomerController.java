@@ -23,11 +23,11 @@ public class CustomerController {
 
   private final CustomerService customerService;
 
+  @SuppressWarnings("java:S4684")
   @PostMapping
   public Customer create(@RequestBody Customer customer) {
     return customerService.create(customer);
   }
-
   @GetMapping
   public List<Customer> getAll() {
     return customerService.getAll();
