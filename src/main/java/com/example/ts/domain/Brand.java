@@ -1,6 +1,7 @@
 package com.example.ts.domain;
 
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -27,5 +28,6 @@ public class Brand {
   private String name;
 
   @OneToMany(mappedBy = "brand")
+  @JsonIgnore
   private List<Toy> toys;
 }

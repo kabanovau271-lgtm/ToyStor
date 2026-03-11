@@ -6,7 +6,7 @@ import lombok.Data;
 public class ToyRequestDto {
 
   private String name;
-  private String brand;
   private Double price;
   private Integer quantity;
+  private Long brandId;
 }

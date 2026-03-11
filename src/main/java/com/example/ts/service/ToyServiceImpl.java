@@ -1,23 +1,28 @@
 package com.example.ts.service;
 
+import com.example.ts.domain.Brand;
 import com.example.ts.domain.Toy;
 import com.example.ts.dto.ToyRequestDto;
 import com.example.ts.dto.ToyResponseDto;
 import com.example.ts.mapper.ToyMapper;
+import com.example.ts.repository.BrandRepository;
 import com.example.ts.repository.ToyRepository;
 import java.util.List;
 import org.springframework.stereotype.Service;
-
 
 @Service
 public class ToyServiceImpl implements ToyService {
 
   private final ToyRepository repository;
   private final ToyMapper mapper;
+  private final BrandRepository brandRepository;
 
-  public ToyServiceImpl(ToyRepository repository, ToyMapper mapper) {
+  public ToyServiceImpl(ToyRepository repository,
+                        ToyMapper mapper,
+                        BrandRepository brandRepository) {
     this.repository = repository;
     this.mapper = mapper;
+    this.brandRepository = brandRepository;
   }
 
   @Override
@@ -45,18 +50,32 @@ public class ToyServiceImpl implements ToyService {
 
   @Override
   public ToyResponseDto createToy(ToyRequestDto dto) {
-    Toy toy = mapper.toEntity(dto);
+
+    Brand brand = brandRepository.findById(dto.getBrandId())
+        .orElseThrow(() -> new IllegalArgumentException("Brand not found"));
+
+    Toy toy = new Toy();
+    toy.setName(dto.getName());
+    toy.setPrice(dto.getPrice());
+    toy.setQuantity(dto.getQuantity());
+    toy.setBrand(brand);
+
     return mapper.toDto(repository.save(toy));
   }
 
   @Override
   public ToyResponseDto updateToy(Long id, ToyRequestDto dto) {
+
     Toy toy = repository.findById(id)
         .orElseThrow(this::toyNotFound);
+
+    Brand brand = brandRepository.findById(dto.getBrandId())
+        .orElseThrow(() -> new IllegalArgumentException("Brand not found"));
 
     toy.setName(dto.getName());
     toy.setPrice(dto.getPrice());
     toy.setQuantity(dto.getQuantity());
+    toy.setBrand(brand);
 
     return mapper.toDto(repository.save(toy));
   }

@@ -7,7 +7,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
-  @Override
-  @EntityGraph(attributePaths = "items")
-  List<Order> findAll();
+  @EntityGraph(attributePaths = {
+      "items",
+      "items.toy",
+      "items.toy.brand",
+      "items.toy.categories"
+  })
+  List<Order> findAllBy();
+
 }

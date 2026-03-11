@@ -15,9 +15,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-
-
-
 @RestController
 @RequestMapping("/orders")
 @RequiredArgsConstructor
@@ -42,8 +39,10 @@ public class OrderController {
   }
 
   @PutMapping("/{id}")
-  public ResponseEntity<Order> update(@PathVariable Long id,
-                                      @RequestBody OrderRequestDto request) {
+  public ResponseEntity<Order> update(
+      @PathVariable Long id,
+      @RequestBody OrderRequestDto request) {
+
     return ResponseEntity.ok(orderService.updateOrder(id, request));
   }
 
@@ -53,20 +52,19 @@ public class OrderController {
     return ResponseEntity.noContent().build();
   }
 
-  @GetMapping("/nplusone")
-  public ResponseEntity<List<Order>> testNPlusOne() {
-    return ResponseEntity.ok(orderService.getAllOrdersWithItemsAccess());
+  @PostMapping("/with-transaction")
+  public ResponseEntity<Order> createWithTransaction(
+      @RequestBody OrderRequestDto request) {
+
+    return ResponseEntity.ok(orderService.createOrderWithTransaction(request));
   }
 
-  @PostMapping("/demo/no-transaction/{customerId}")
-  public ResponseEntity<Void> demoNoTransaction(@PathVariable Long customerId) {
-    orderService.createOrderWithoutTransactionDemo(customerId);
-    return ResponseEntity.ok().build();
+  @PostMapping("/without-transaction")
+  public ResponseEntity<Order> createWithoutTransaction(
+      @RequestBody OrderRequestDto request) {
+
+    return ResponseEntity.ok(orderService.createOrderWithoutTransaction(request));
   }
 
-  @PostMapping("/demo/with-transaction/{customerId}")
-  public ResponseEntity<Void> demoWithTransaction(@PathVariable Long customerId) {
-    orderService.createOrderWithTransactionDemo(customerId);
-    return ResponseEntity.ok().build();
-  }
+
 }

@@ -1,20 +1,11 @@
 package com.example.ts.mapper;
 
 import com.example.ts.domain.Toy;
-import com.example.ts.dto.ToyRequestDto;
 import com.example.ts.dto.ToyResponseDto;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ToyMapper {
-
-  public Toy toEntity(ToyRequestDto dto) {
-    Toy toy = new Toy();
-    toy.setName(dto.getName());
-    toy.setPrice(dto.getPrice());
-    toy.setQuantity(dto.getQuantity());
-    return toy;
-  }
 
   public ToyResponseDto toDto(Toy toy) {
     ToyResponseDto dto = new ToyResponseDto();
@@ -22,6 +13,7 @@ public class ToyMapper {
     dto.setName(toy.getName());
     dto.setPrice(toy.getPrice());
     dto.setQuantity(toy.getQuantity());
+    dto.setBrand(toy.getBrand().getName());
     return dto;
   }
 }

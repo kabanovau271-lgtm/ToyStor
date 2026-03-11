@@ -16,8 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-
-
 @Service
 @RequiredArgsConstructor
 public class OrderService {
@@ -26,13 +24,12 @@ public class OrderService {
   private final CustomerRepository customerRepository;
   private final ToyRepository toyRepository;
 
-  // Константы сообщений
+  // ========================= CONSTANTS =========================
+
   private static final String CUSTOMER_NOT_FOUND = "Customer not found";
   private static final String TOY_NOT_FOUND = "Toy not found";
   private static final String ORDER_NOT_FOUND = "Order not found";
   private static final String NOT_ENOUGH_STOCK = "Not enough toys in stock";
-  private static final String ARTIFICIAL_ERROR =
-      "Artificial error for transaction demonstration";
 
   // ========================= CREATE =========================
 
@@ -44,7 +41,7 @@ public class OrderService {
   // ========================= READ =========================
 
   public List<Order> getAllOrders() {
-    return orderRepository.findAll();
+    return orderRepository.findAllBy();
   }
 
   public Order getOrderById(Long id) {
@@ -76,36 +73,40 @@ public class OrderService {
   // ========================= DELETE =========================
 
   public void deleteOrder(Long id) {
+
     if (!orderRepository.existsById(id)) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, ORDER_NOT_FOUND);
     }
+
     orderRepository.deleteById(id);
   }
 
-  // ========================= N+1 DEMO =========================
+  // ========================= TRANSACTION DEMONSTRATION =========================
 
-  @Transactional
-  public List<Order> getAllOrdersWithItemsAccess() {
-
-    List<Order> orders = orderRepository.findAll();
-
-    // провоцируем lazy-загрузку
-    orders.forEach(order -> order.getItems().size());
-
-    return orders;
-  }
-
-  // ========================= TRANSACTION DEMO =========================
-
-  public void createOrderWithoutTransactionDemo(Long customerId) {
-    createOrderDemo(customerId);
+  public Order createOrderWithoutTransaction(OrderRequestDto request) {
+    return createOrderInternal(request);
   }
 
   @Transactional
-  public void createOrderWithTransactionDemo(Long customerId) {
-    createOrderDemo(customerId);
+  public Order createOrderWithTransaction(OrderRequestDto request) {
+    return createOrderInternal(request);
   }
 
+  private Order createOrderInternal(OrderRequestDto request) {
+
+    Customer customer = findCustomer(request.customerId());
+
+    Order order = new Order();
+    order.setCreatedAt(LocalDateTime.now());
+    order.setCustomer(customer);
+
+    orderRepository.save(order);
+
+    Toy toy = toyRepository.findAll().get(0);
+    toy.setQuantity(toy.getQuantity() - 1);
+
+    throw new IllegalStateException("Transaction rollback demo");
+  }
   // ========================= PRIVATE LOGIC =========================
 
   private Order buildAndSaveOrder(OrderRequestDto request) {
@@ -151,25 +152,9 @@ public class OrderService {
   }
 
   private Customer findCustomer(Long customerId) {
+
     return customerRepository.findById(customerId)
         .orElseThrow(() ->
             new ResponseStatusException(HttpStatus.NOT_FOUND, CUSTOMER_NOT_FOUND));
-  }
-
-  private void createOrderDemo(Long customerId) {
-
-    Customer customer = findCustomer(customerId);
-
-    Order order = new Order();
-    order.setCreatedAt(LocalDateTime.now());
-    order.setCustomer(customer);
-
-    orderRepository.save(order);
-
-    // искусственная ошибка для демонстрации rollback
-    throw new ResponseStatusException(
-        HttpStatus.BAD_REQUEST,
-        ARTIFICIAL_ERROR
-    );
   }
 }

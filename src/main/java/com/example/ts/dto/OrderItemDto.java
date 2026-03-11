@@ -3,12 +3,10 @@ package com.example.ts.dto;
 import lombok.Data;
 
 @Data
-public class ToyResponseDto {
+public class OrderItemDto {
 
   private Long id;
-  private String name;
-  private Double price;
+  private Long toyId;
   private Integer quantity;
-  private String brand;
 
 }

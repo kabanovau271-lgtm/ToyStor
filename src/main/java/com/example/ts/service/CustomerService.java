@@ -1,29 +1,15 @@
 package com.example.ts.service;
 
 import com.example.ts.domain.Customer;
-import com.example.ts.repository.CustomerRepository;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
+public interface CustomerService {
 
+  Customer create(Customer customer);
 
-@Service
-@RequiredArgsConstructor
-public class CustomerService {
+  List<Customer> getAll();
 
-  private final CustomerRepository customerRepository;
+  Customer getById(Long id);
 
-  public Customer create(Customer customer) {
-    return customerRepository.save(customer);
-  }
-
-  public List<Customer> getAll() {
-    return customerRepository.findAll();
-  }
-
-  public Customer getById(Long id) {
-    return customerRepository.findById(id)
-        .orElseThrow();
-  }
+  void deleteCustomer(Long id);
 }
