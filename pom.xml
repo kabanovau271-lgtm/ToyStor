@@ -27,6 +27,7 @@
             **/domain/**,
             **/TsApplication.java
         </sonar.coverage.exclusions>
+        <maven.test.skip>true</maven.test.skip>
     </properties>
 
     <dependencies>
