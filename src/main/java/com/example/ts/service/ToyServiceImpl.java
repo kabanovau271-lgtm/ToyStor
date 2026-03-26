@@ -1,33 +1,56 @@
 package com.example.ts.service;
 
 import com.example.ts.domain.Brand;
+import com.example.ts.domain.Category;
 import com.example.ts.domain.Toy;
 import com.example.ts.dto.ToyRequestDto;
 import com.example.ts.dto.ToyResponseDto;
 import com.example.ts.mapper.ToyMapper;
 import com.example.ts.repository.BrandRepository;
+import com.example.ts.repository.CategoryRepository;
+import com.example.ts.repository.OrderItemRepository;
 import com.example.ts.repository.ToyRepository;
+import com.example.ts.cache.ToySearchKey;
+
+import java.util.HashMap;
+import java.util.Map;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ToyServiceImpl implements ToyService {
 
+  private static final Logger log = LoggerFactory.getLogger(ToyServiceImpl.class);
   private final ToyRepository repository;
   private final ToyMapper mapper;
   private final BrandRepository brandRepository;
+  private final CategoryRepository categoryRepository;
+  private final OrderItemRepository orderItemRepository;
+  private final Map<ToySearchKey, Page<ToyResponseDto>> cache = new HashMap<>();
 
   public ToyServiceImpl(ToyRepository repository,
                         ToyMapper mapper,
-                        BrandRepository brandRepository) {
+                        BrandRepository brandRepository,
+                        CategoryRepository categoryRepository,
+                        OrderItemRepository orderItemRepository) {
     this.repository = repository;
     this.mapper = mapper;
     this.brandRepository = brandRepository;
+    this.categoryRepository = categoryRepository;
+    this.orderItemRepository = orderItemRepository;
   }
 
   @Override
   public List<ToyResponseDto> getAllToys() {
-    return repository.findAll()
+    return repository.findAllWithCategories()
         .stream()
         .map(mapper::toDto)
         .toList();
@@ -35,7 +58,7 @@ public class ToyServiceImpl implements ToyService {
 
   @Override
   public ToyResponseDto getToyById(Long id) {
-    Toy toy = repository.findById(id)
+    Toy toy = repository.findByIdWithCategories(id)
         .orElseThrow(this::toyNotFound);
     return mapper.toDto(toy);
   }
@@ -54,13 +77,24 @@ public class ToyServiceImpl implements ToyService {
     Brand brand = brandRepository.findById(dto.getBrandId())
         .orElseThrow(() -> new IllegalArgumentException("Brand not found"));
 
+    Set<Category> categories = dto.getCategoryIds()
+        .stream()
+        .map(id -> categoryRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("Category not found")))
+        .collect(Collectors.toSet());
+
     Toy toy = new Toy();
     toy.setName(dto.getName());
     toy.setPrice(dto.getPrice());
     toy.setQuantity(dto.getQuantity());
     toy.setBrand(brand);
+    toy.setCategories(categories);
 
-    return mapper.toDto(repository.save(toy));
+    Toy saved = repository.save(toy);
+
+    cache.clear();
+
+    return mapper.toDto(saved);
   }
 
   @Override
@@ -72,20 +106,83 @@ public class ToyServiceImpl implements ToyService {
     Brand brand = brandRepository.findById(dto.getBrandId())
         .orElseThrow(() -> new IllegalArgumentException("Brand not found"));
 
+    Set<Category> categories = dto.getCategoryIds()
+        .stream()
+        .map(catId -> categoryRepository.findById(catId)
+            .orElseThrow(() -> new IllegalArgumentException("Category not found")))
+        .collect(Collectors.toSet());
+
     toy.setName(dto.getName());
     toy.setPrice(dto.getPrice());
     toy.setQuantity(dto.getQuantity());
     toy.setBrand(brand);
+    toy.setCategories(categories);
 
-    return mapper.toDto(repository.save(toy));
+    Toy updated = repository.save(toy);
+    cache.clear();
+
+    return mapper.toDto(updated);
   }
 
   @Override
+  @Transactional
   public void deleteToy(Long id) {
-    repository.deleteById(id);
+
+    Toy toy = repository.findById(id)
+        .orElseThrow(this::toyNotFound);
+
+    orderItemRepository.deleteByToy_Id(id);
+
+    repository.delete(toy);
+
+    cache.clear();
   }
 
   private IllegalArgumentException toyNotFound() {
     return new IllegalArgumentException("Toy not found");
+  }
+
+ @Override
+  public Page<ToyResponseDto> getByCategoryAndPrice(
+      String category,
+      Double minPrice,
+      int page,
+      int size
+  ) {
+
+    ToySearchKey key = new ToySearchKey(category, minPrice, page, size);
+
+    if (cache.containsKey(key)) {
+      log.info("FROM CACHE");
+      return cache.get(key);
+    }
+
+    Page<Toy> toys = repository.findByCategoryAndPrice(
+        category,
+        minPrice,
+        PageRequest.of(page, size)
+    );
+
+    Page<ToyResponseDto> result = toys.map(mapper::toDto);
+    cache.put(key, result);
+
+    return result;
+  }
+
+  @Override
+  public Page<ToyResponseDto> getByCategoryAndPriceNative(
+      String category,
+      Double minPrice,
+      int page,
+      int size
+  ) {
+
+    Page<Toy> toys = repository.findByCategoryAndPriceNative(
+        category,
+        minPrice,
+        PageRequest.of(page, size)
+    );
+
+    return toys.map(mapper::toDto);
   }
 }

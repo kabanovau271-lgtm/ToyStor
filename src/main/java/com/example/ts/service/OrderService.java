@@ -24,21 +24,16 @@ public class OrderService {
   private final CustomerRepository customerRepository;
   private final ToyRepository toyRepository;
 
-  // ========================= CONSTANTS =========================
-
   private static final String CUSTOMER_NOT_FOUND = "Customer not found";
   private static final String TOY_NOT_FOUND = "Toy not found";
   private static final String ORDER_NOT_FOUND = "Order not found";
   private static final String NOT_ENOUGH_STOCK = "Not enough toys in stock";
 
-  // ========================= CREATE =========================
 
   @Transactional
   public Order createOrder(OrderRequestDto request) {
     return buildAndSaveOrder(request);
   }
-
-  // ========================= READ =========================
 
   public List<Order> getAllOrders() {
     return orderRepository.findAllBy();
@@ -50,7 +45,6 @@ public class OrderService {
             new ResponseStatusException(HttpStatus.NOT_FOUND, ORDER_NOT_FOUND));
   }
 
-  // ========================= UPDATE =========================
 
   @Transactional
   public Order updateOrder(Long id, OrderRequestDto request) {
@@ -70,8 +64,6 @@ public class OrderService {
     return orderRepository.save(order);
   }
 
-  // ========================= DELETE =========================
-
   public void deleteOrder(Long id) {
 
     if (!orderRepository.existsById(id)) {
@@ -81,9 +73,7 @@ public class OrderService {
     orderRepository.deleteById(id);
   }
 
-  // ========================= TRANSACTION DEMONSTRATION =========================
-
-  public Order createOrderWithoutTransaction(OrderRequestDto request) {
+  public Order createOrderWithoutTransaction(OrderRequestDto request)   {
     return createOrderInternal(request);
   }
 
@@ -107,7 +97,6 @@ public class OrderService {
 
     throw new IllegalStateException("Transaction rollback demo");
   }
-  // ========================= PRIVATE LOGIC =========================
 
   private Order buildAndSaveOrder(OrderRequestDto request) {
 

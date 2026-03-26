@@ -3,6 +3,7 @@ package com.example.ts.service;
 import com.example.ts.dto.ToyRequestDto;
 import com.example.ts.dto.ToyResponseDto;
 import java.util.List;
+import org.springframework.data.domain.Page;
 
 public interface ToyService {
 
@@ -17,4 +18,19 @@ public interface ToyService {
   ToyResponseDto updateToy(Long id, ToyRequestDto dto);
 
   void deleteToy(Long id);
+
+  public Page<ToyResponseDto> getByCategoryAndPrice(
+      String category,
+      Double minPrice,
+      int page,
+      int size
+  );
+
+  Page<ToyResponseDto> getByCategoryAndPriceNative(
+      String category,
+      Double minPrice,
+      int page,
+      int size
+  );
+
 }

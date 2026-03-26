@@ -4,6 +4,7 @@ import com.example.ts.dto.ToyRequestDto;
 import com.example.ts.dto.ToyResponseDto;
 import com.example.ts.service.ToyService;
 import java.util.List;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -52,5 +53,25 @@ public class ToyController {
   @DeleteMapping("/{id}")
   public void delete(@PathVariable Long id) {
     service.deleteToy(id);
+  }
+
+  @GetMapping("/filter")
+  public Page<ToyResponseDto> filter(
+      @RequestParam String category,
+      @RequestParam Double minPrice,
+      @RequestParam int page,
+      @RequestParam int size
+  ) {
+    return service.getByCategoryAndPrice(category, minPrice, page, size);
+  }
+
+  @GetMapping("/filter-native")
+  public Page<ToyResponseDto> filterNative(
+      @RequestParam String category,
+      @RequestParam Double minPrice,
+      @RequestParam int page,
+      @RequestParam int size
+  ) {
+    return service.getByCategoryAndPriceNative(category, minPrice, page, size);
   }
 }
