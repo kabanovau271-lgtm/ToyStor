@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -19,10 +20,13 @@ public interface ToyRepository extends JpaRepository<Toy, Long> {
   @Query("SELECT DISTINCT t FROM Toy t LEFT JOIN FETCH t.categories WHERE t.id = :id")
   Optional<Toy> findByIdWithCategories(Long id);
 
-  @Query("SELECT t FROM Toy t " +
-      "JOIN t.categories c " +
-      "WHERE c.name = :categoryName " +
-      "AND t.price >= :minPrice")
+  @EntityGraph(attributePaths = {"categories", "brand"})
+  @Query("""
+SELECT t FROM Toy t
+JOIN t.categories c
+WHERE c.name = :categoryName
+AND t.price >= :minPrice
+""")
   Page<Toy> findByCategoryAndPrice(
       @Param("categoryName") String categoryName,
       @Param("minPrice") Double minPrice,
