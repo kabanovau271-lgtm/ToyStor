@@ -258,9 +258,9 @@ class ToyServiceImplTest {
     when(mapper.toDto(any())).thenReturn(new ToyResponseDto());
 
     List<ToyResponseDto> result =
-        service.createToysBulkNoTx(List.of(dto));
+        service.createToysBulkNoTx(List.of(dto, dto));
 
-    assertEquals(1, result.size());
+    assertEquals(2, result.size());
   }
 
   @Test
@@ -271,9 +271,9 @@ class ToyServiceImplTest {
     when(mapper.toDto(any())).thenReturn(new ToyResponseDto());
 
     List<ToyResponseDto> result =
-        service.createToysBulkTx(List.of(dto));
+        service.createToysBulkTx(List.of(dto, dto));
 
-    assertEquals(1, result.size());
+    assertEquals(2, result.size());
   }
 
   @Test
@@ -396,4 +396,6 @@ class ToyServiceImplTest {
     assertThrows(AppException.class,
         () -> service.updateToy(999L, dto));
   }
+
+
 }
