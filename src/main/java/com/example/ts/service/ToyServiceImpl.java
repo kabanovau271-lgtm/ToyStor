@@ -28,8 +28,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class ToyServiceImpl implements ToyService {
 
   private static final Logger log = LoggerFactory.getLogger(ToyServiceImpl.class);
+
   private static final String BRAND_NOT_FOUND = "Brand not found";
   private static final String CATEGORY_NOT_FOUND = "Category not found";
+  private static final String TOY_NOT_FOUND = "Toy not found";
+
   private final ToyRepository repository;
   private final ToyMapper mapper;
   private final BrandRepository brandRepository;
@@ -76,24 +79,12 @@ public class ToyServiceImpl implements ToyService {
   @Override
   public ToyResponseDto createToy(ToyRequestDto dto) {
 
-    Brand brand = brandRepository.findById(dto.getBrandId())
-        .orElseThrow(() -> new AppException(BRAND_NOT_FOUND, 404));
+    Brand brand = getBrandOrThrow(dto.getBrandId());
+    Set<Category> categories = getCategoriesOrThrow(dto.getCategoryIds());
 
-    Set<Category> categories = dto.getCategoryIds()
-        .stream()
-        .map(id -> categoryRepository.findById(id)
-            .orElseThrow(() -> new AppException(CATEGORY_NOT_FOUND, 404)))
-        .collect(Collectors.toSet());
-
-    Toy toy = new Toy();
-    toy.setName(dto.getName());
-    toy.setPrice(dto.getPrice());
-    toy.setQuantity(dto.getQuantity());
-    toy.setBrand(brand);
-    toy.setCategories(categories);
+    Toy toy = buildToy(dto, brand, categories);
 
     Toy saved = repository.save(toy);
-
     cache.clear();
 
     return mapper.toDto(saved);
@@ -105,13 +96,8 @@ public class ToyServiceImpl implements ToyService {
     Toy toy = repository.findById(id)
         .orElseThrow(this::toyNotFound);
 
-    Brand brand = brandRepository.findById(dto.getBrandId())
-        .orElseThrow(() -> new AppException(BRAND_NOT_FOUND, 404));
-    Set<Category> categories = dto.getCategoryIds()
-        .stream()
-        .map(catId -> categoryRepository.findById(catId)
-            .orElseThrow(() -> new AppException(CATEGORY_NOT_FOUND, 404)))
-        .collect(Collectors.toSet());
+    Brand brand = getBrandOrThrow(dto.getBrandId());
+    Set<Category> categories = getCategoriesOrThrow(dto.getCategoryIds());
 
     toy.setName(dto.getName());
     toy.setPrice(dto.getPrice());
@@ -138,10 +124,6 @@ public class ToyServiceImpl implements ToyService {
 
     repository.delete(toy);
     cache.clear();
-  }
-
-  private AppException toyNotFound() {
-    return new AppException("Toy not found", 404);
   }
 
   @Override
@@ -192,27 +174,7 @@ public class ToyServiceImpl implements ToyService {
   public List<ToyResponseDto> createToysBulk(List<ToyRequestDto> dtos) {
 
     return dtos.stream()
-        .map(dto -> {
-
-          Brand brand = brandRepository.findById(dto.getBrandId())
-              .orElseThrow(() -> new AppException(BRAND_NOT_FOUND, 404));
-
-          Set<Category> categories = dto.getCategoryIds()
-              .stream()
-              .map(id -> categoryRepository.findById(id)
-                  .orElseThrow(() -> new AppException(CATEGORY_NOT_FOUND, 404)))
-              .collect(Collectors.toSet());
-
-          Toy toy = new Toy();
-          toy.setName(dto.getName());
-          toy.setPrice(dto.getPrice());
-          toy.setQuantity(dto.getQuantity());
-          toy.setBrand(brand);
-          toy.setCategories(categories);
-
-          return repository.save(toy);
-
-        })
+        .map(this::createToyInternal)
         .map(mapper::toDto)
         .toList();
   }
@@ -222,28 +184,10 @@ public class ToyServiceImpl implements ToyService {
 
     return dtos.stream()
         .map(dto -> {
-
           if ("ERROR".equals(dto.getName())) {
             throw new AppException("Test error", 400);
           }
-
-          Brand brand = brandRepository.findById(dto.getBrandId())
-              .orElseThrow(() -> new AppException(BRAND_NOT_FOUND, 404));
-
-          Set<Category> categories = dto.getCategoryIds().stream()
-              .map(id -> categoryRepository.findById(id)
-                  .orElseThrow(() -> new AppException(CATEGORY_NOT_FOUND, 404)))
-              .collect(Collectors.toSet());
-
-          Toy toy = new Toy();
-          toy.setName(dto.getName());
-          toy.setPrice(dto.getPrice());
-          toy.setQuantity(dto.getQuantity());
-          toy.setBrand(brand);
-          toy.setCategories(categories);
-
-          return repository.save(toy);
-
+          return createToyInternal(dto);
         })
         .map(mapper::toDto)
         .toList();
@@ -255,30 +199,47 @@ public class ToyServiceImpl implements ToyService {
 
     return dtos.stream()
         .map(dto -> {
-
           if ("ERROR".equals(dto.getName())) {
             throw new AppException("Test error", 400);
           }
-
-          Brand brand = brandRepository.findById(dto.getBrandId())
-              .orElseThrow(() -> new AppException(BRAND_NOT_FOUND, 404));
-
-          Set<Category> categories = dto.getCategoryIds().stream()
-              .map(id -> categoryRepository.findById(id)
-                  .orElseThrow(() -> new AppException(CATEGORY_NOT_FOUND, 404)))
-              .collect(Collectors.toSet());
-
-          Toy toy = new Toy();
-          toy.setName(dto.getName());
-          toy.setPrice(dto.getPrice());
-          toy.setQuantity(dto.getQuantity());
-          toy.setBrand(brand);
-          toy.setCategories(categories);
-
-          return repository.save(toy);
-
+          return createToyInternal(dto);
         })
         .map(mapper::toDto)
         .toList();
-    }
   }
+
+
+  private Toy createToyInternal(ToyRequestDto dto) {
+    Brand brand = getBrandOrThrow(dto.getBrandId());
+    Set<Category> categories = getCategoriesOrThrow(dto.getCategoryIds());
+
+    Toy toy = buildToy(dto, brand, categories);
+    return repository.save(toy);
+  }
+
+  private Brand getBrandOrThrow(Long brandId) {
+    return brandRepository.findById(brandId)
+        .orElseThrow(() -> new AppException(BRAND_NOT_FOUND, 404));
+  }
+
+  private Set<Category> getCategoriesOrThrow(Set<Long> categoryIds) {
+    return categoryIds.stream()
+        .map(id -> categoryRepository.findById(id)
+            .orElseThrow(() -> new AppException(CATEGORY_NOT_FOUND, 404)))
+        .collect(Collectors.toSet());
+  }
+
+  private Toy buildToy(ToyRequestDto dto, Brand brand, Set<Category> categories) {
+    Toy toy = new Toy();
+    toy.setName(dto.getName());
+    toy.setPrice(dto.getPrice());
+    toy.setQuantity(dto.getQuantity());
+    toy.setBrand(brand);
+    toy.setCategories(categories);
+    return toy;
+  }
+
+  private AppException toyNotFound() {
+    return new AppException(TOY_NOT_FOUND, 404);
+  }
+}
