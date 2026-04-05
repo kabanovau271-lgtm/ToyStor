@@ -249,4 +249,66 @@ class ToyServiceImplTest {
     assertThrows(AppException.class,
         () -> service.createToysBulkTx(list));
   }
+
+  @Test
+  void bulk_noTx_success() {
+    when(brandRepository.findById(1L)).thenReturn(Optional.of(brand));
+    when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
+    when(repository.save(any())).thenReturn(toy);
+    when(mapper.toDto(any())).thenReturn(new ToyResponseDto());
+
+    List<ToyResponseDto> result =
+        service.createToysBulkNoTx(List.of(dto));
+
+    assertEquals(1, result.size());
+  }
+
+  @Test
+  void bulk_tx_success() {
+    when(brandRepository.findById(1L)).thenReturn(Optional.of(brand));
+    when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
+    when(repository.save(any())).thenReturn(toy);
+    when(mapper.toDto(any())).thenReturn(new ToyResponseDto());
+
+    List<ToyResponseDto> result =
+        service.createToysBulkTx(List.of(dto));
+
+    assertEquals(1, result.size());
+  }
+
+  @Test
+  void getByCategoryAndPrice_cacheReturn() {
+    Page<Toy> page = new PageImpl<>(List.of(toy));
+
+    when(repository.findByCategoryAndPrice(any(), any(), any()))
+        .thenReturn(page);
+    when(mapper.toDto(any())).thenReturn(new ToyResponseDto());
+
+    var first = service.getByCategoryAndPrice("cat", 10.0, 0, 10);
+    var second = service.getByCategoryAndPrice("cat", 10.0, 0, 10);
+
+    assertSame(first, second);
+  }
+
+  @Test
+  void bulk_categoryNotFound() {
+    when(brandRepository.findById(1L)).thenReturn(Optional.of(brand));
+    when(categoryRepository.findById(1L)).thenReturn(Optional.empty());
+
+    List<ToyRequestDto> list = List.of(dto); // ВНЕ lambda
+
+    assertThrows(AppException.class,
+        () -> service.createToysBulk(list));
+  }
+
+  @Test
+  void bulk_brandNotFound() {
+    when(brandRepository.findById(1L)).thenReturn(Optional.empty());
+
+    List<ToyRequestDto> list = List.of(dto); // ВНЕ lambda
+
+    assertThrows(AppException.class,
+        () -> service.createToysBulk(list));
+  }
+
 }
