@@ -94,4 +94,30 @@ public class ToyController {
   ) {
     return service.getByCategoryAndPriceNative(category, minPrice, page, size);
   }
+
+  @Operation(summary = "Создать несколько игрушек")
+  @PostMapping("/bulk")
+  public List<ToyResponseDto> createBulk(
+      @Valid @RequestBody List<ToyRequestDto> dtos) {
+
+    return service.createToysBulk(dtos);
+  }
+
+  @Operation(
+      summary = "Bulk создание игрушек без транзакции",
+      description = "Создаёт несколько игрушек. При ошибке часть данных может сохраниться"
+  )
+  @PostMapping("/bulk-no-tx")
+  public List<ToyResponseDto> bulkNoTx(@RequestBody List<ToyRequestDto> dtos) {
+    return service.createToysBulkNoTx(dtos);
+  }
+
+  @Operation(
+      summary = "Bulk создание игрушек с транзакцией",
+      description = "Создаёт несколько игрушек. При ошибке происходит rollback (ничего не сохраняется)"
+  )
+  @PostMapping("/bulk-tx")
+  public List<ToyResponseDto> bulkTx(@RequestBody List<ToyRequestDto> dtos) {
+    return service.createToysBulkTx(dtos);
+  }
 }

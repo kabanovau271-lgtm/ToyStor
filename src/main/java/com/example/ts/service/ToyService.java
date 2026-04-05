@@ -33,4 +33,7 @@ public interface ToyService {
       int size
   );
 
+  List<ToyResponseDto> createToysBulk(List<ToyRequestDto> dto);
+  public List<ToyResponseDto> createToysBulkNoTx(List<ToyRequestDto> dto);
+  public List<ToyResponseDto> createToysBulkTx(List<ToyRequestDto> dto);
 }
