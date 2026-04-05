@@ -311,4 +311,40 @@ class ToyServiceImplTest {
         () -> service.createToysBulk(list));
   }
 
+  @Test
+  void getByCategoryAndPrice_cacheHit_returnFromCache() {
+    Page<Toy> page = new PageImpl<>(List.of(toy));
+    ToyResponseDto dtoResp = new ToyResponseDto();
+
+    when(repository.findByCategoryAndPrice(any(), any(), any()))
+        .thenReturn(page);
+    when(mapper.toDto(any())).thenReturn(dtoResp);
+
+    service.getByCategoryAndPrice("cat", 10.0, 0, 10);
+
+    Page<ToyResponseDto> result =
+        service.getByCategoryAndPrice("cat", 10.0, 0, 10);
+
+    assertEquals(1, result.getContent().size());
+    verify(repository, times(1))
+        .findByCategoryAndPrice(any(), any(), any());
+  }
+
+  @Test
+  void createToy_clearsCache() {
+    when(brandRepository.findById(1L)).thenReturn(Optional.of(brand));
+    when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
+    when(repository.save(any())).thenReturn(toy);
+    when(mapper.toDto(any())).thenReturn(new ToyResponseDto());
+
+    service.getByCategoryAndPrice("cat", 10.0, 0, 10);
+
+    service.createToy(dto);
+
+    service.getByCategoryAndPrice("cat", 10.0, 0, 10);
+
+    verify(repository, times(2))
+        .findByCategoryAndPrice(any(), any(), any());
+  }
+
 }
