@@ -183,8 +183,11 @@ class OrderServiceTest {
 
   // ===== TRANSACTION METHODS =====
 
+
   @Test
   void createOrderWithoutTransaction_shouldThrowException() {
+    toy.setQuantity(0); // 👈 ВАЖНО
+
     when(customerRepository.findById(1L)).thenReturn(Optional.of(customer));
     when(toyRepository.findAll()).thenReturn(List.of(toy));
     when(orderRepository.save(any(Order.class))).thenAnswer(i -> i.getArgument(0));
@@ -196,6 +199,8 @@ class OrderServiceTest {
 
   @Test
   void createOrderWithTransaction_shouldThrowException() {
+    toy.setQuantity(0); // 👈 ВАЖНО
+
     when(customerRepository.findById(1L)).thenReturn(Optional.of(customer));
     when(toyRepository.findAll()).thenReturn(List.of(toy));
     when(orderRepository.save(any(Order.class))).thenAnswer(i -> i.getArgument(0));
