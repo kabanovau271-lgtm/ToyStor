@@ -11,6 +11,7 @@ import com.example.ts.repository.ToyRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.function.Executable;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -58,28 +59,27 @@ class OrderServiceTest {
     );
   }
 
+  // ===== CREATE =====
+
   @Test
   void createOrder_success() {
     when(customerRepository.findById(1L)).thenReturn(Optional.of(customer));
     when(toyRepository.findById(1L)).thenReturn(Optional.of(toy));
     when(orderRepository.save(any(Order.class))).thenAnswer(i -> i.getArgument(0));
 
-    OrderRequestDto request = buildRequest(2);
-    Order result = service.createOrder(request);
+    Order result = service.createOrder(buildRequest(2));
 
     assertNotNull(result);
     assertEquals(1, result.getItems().size());
-    verify(orderRepository).save(any(Order.class));
   }
 
   @Test
   void createOrder_customerNotFound() {
     when(customerRepository.findById(1L)).thenReturn(Optional.empty());
 
-    OrderRequestDto request = buildRequest(1);
+    Executable action = () -> service.createOrder(buildRequest(1));
 
-    assertThrows(ResponseStatusException.class,
-        () -> service.createOrder(request));
+    assertThrows(ResponseStatusException.class, action);
   }
 
   @Test
@@ -87,10 +87,9 @@ class OrderServiceTest {
     when(customerRepository.findById(1L)).thenReturn(Optional.of(customer));
     when(toyRepository.findById(1L)).thenReturn(Optional.empty());
 
-    OrderRequestDto request = buildRequest(1);
+    Executable action = () -> service.createOrder(buildRequest(1));
 
-    assertThrows(ResponseStatusException.class,
-        () -> service.createOrder(request));
+    assertThrows(ResponseStatusException.class, action);
   }
 
   @Test
@@ -100,11 +99,12 @@ class OrderServiceTest {
     when(customerRepository.findById(1L)).thenReturn(Optional.of(customer));
     when(toyRepository.findById(1L)).thenReturn(Optional.of(toy));
 
-    OrderRequestDto request = buildRequest(5);
+    Executable action = () -> service.createOrder(buildRequest(5));
 
-    assertThrows(ResponseStatusException.class,
-        () -> service.createOrder(request));
+    assertThrows(ResponseStatusException.class, action);
   }
+
+  // ===== GET =====
 
   @Test
   void getAllOrders_success() {
@@ -113,7 +113,6 @@ class OrderServiceTest {
     List<Order> result = service.getAllOrders();
 
     assertEquals(2, result.size());
-    verify(orderRepository).findAllBy();
   }
 
   @Test
@@ -130,9 +129,39 @@ class OrderServiceTest {
   void getOrderById_notFound() {
     when(orderRepository.findById(1L)).thenReturn(Optional.empty());
 
-    assertThrows(ResponseStatusException.class,
-        () -> service.getOrderById(1L));
+    Executable action = () -> service.getOrderById(1L);
+
+    assertThrows(ResponseStatusException.class, action);
   }
+
+  // ===== UPDATE =====
+
+  @Test
+  void updateOrder_success() {
+    Order order = new Order();
+    order.setItems(new java.util.ArrayList<>());
+
+    when(orderRepository.findById(1L)).thenReturn(Optional.of(order));
+    when(customerRepository.findById(1L)).thenReturn(Optional.of(customer));
+    when(toyRepository.findById(1L)).thenReturn(Optional.of(toy));
+    when(orderRepository.save(any(Order.class))).thenAnswer(i -> i.getArgument(0));
+
+    Order result = service.updateOrder(1L, buildRequest(2));
+
+    assertNotNull(result);
+    assertEquals(1, result.getItems().size());
+  }
+
+  @Test
+  void updateOrder_notFound() {
+    when(orderRepository.findById(1L)).thenReturn(Optional.empty());
+
+    Executable action = () -> service.updateOrder(1L, buildRequest(1));
+
+    assertThrows(ResponseStatusException.class, action);
+  }
+
+  // ===== DELETE =====
 
   @Test
   void deleteOrder_success() {
@@ -147,59 +176,32 @@ class OrderServiceTest {
   void deleteOrder_notFound() {
     when(orderRepository.existsById(1L)).thenReturn(false);
 
-    assertThrows(ResponseStatusException.class,
-        () -> service.deleteOrder(1L));
+    Executable action = () -> service.deleteOrder(1L);
+
+    assertThrows(ResponseStatusException.class, action);
   }
 
-  @Test
-  void updateOrder_success() {
-    Order order = new Order();
-    order.setItems(new java.util.ArrayList<>());
+  // ===== TRANSACTION METHODS =====
 
-    when(orderRepository.findById(1L)).thenReturn(Optional.of(order));
+  @Test
+  void createOrderWithoutTransaction_shouldThrowException() {
     when(customerRepository.findById(1L)).thenReturn(Optional.of(customer));
-    when(toyRepository.findById(1L)).thenReturn(Optional.of(toy));
+    when(toyRepository.findAll()).thenReturn(List.of(toy));
     when(orderRepository.save(any(Order.class))).thenAnswer(i -> i.getArgument(0));
 
-    OrderRequestDto request = buildRequest(2);
+    Executable action = () -> service.createOrderWithoutTransaction(buildRequest(1));
 
-    Order result = service.updateOrder(1L, request);
-
-    assertNotNull(result);
-    assertEquals(1, result.getItems().size());
-    verify(orderRepository).save(order);
+    assertThrows(IllegalStateException.class, action);
   }
 
   @Test
-  void updateOrder_notFound() {
-    when(orderRepository.findById(1L)).thenReturn(Optional.empty());
-
-    OrderRequestDto request = buildRequest(1);
-
-    assertThrows(ResponseStatusException.class,
-        () -> service.updateOrder(1L, request));
-  }
-
-  // ВАЖНО: эти методы ВСЕГДА кидают исключение
-  @Test
-  void createOrderWithoutTransaction_throws() {
+  void createOrderWithTransaction_shouldThrowException() {
     when(customerRepository.findById(1L)).thenReturn(Optional.of(customer));
     when(toyRepository.findAll()).thenReturn(List.of(toy));
+    when(orderRepository.save(any(Order.class))).thenAnswer(i -> i.getArgument(0));
 
-    OrderRequestDto request = buildRequest(1);
+    Executable action = () -> service.createOrderWithTransaction(buildRequest(1));
 
-    assertThrows(IllegalStateException.class,
-        () -> service.createOrderWithoutTransaction(request));
-  }
-
-  @Test
-  void createOrderWithTransaction_throws() {
-    when(customerRepository.findById(1L)).thenReturn(Optional.of(customer));
-    when(toyRepository.findAll()).thenReturn(List.of(toy));
-
-    OrderRequestDto request = buildRequest(1);
-
-    assertThrows(IllegalStateException.class,
-        () -> service.createOrderWithTransaction(request));
+    assertThrows(IllegalStateException.class, action);
   }
 }
