@@ -5,6 +5,7 @@ import com.example.ts.domain.Category;
 import com.example.ts.domain.Toy;
 import com.example.ts.dto.ToyRequestDto;
 import com.example.ts.dto.ToyResponseDto;
+import com.example.ts.exception.AppException;
 import com.example.ts.mapper.ToyMapper;
 import com.example.ts.repository.BrandRepository;
 import com.example.ts.repository.CategoryRepository;
@@ -29,11 +30,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class ToyServiceImpl implements ToyService {
 
   private static final Logger log = LoggerFactory.getLogger(ToyServiceImpl.class);
+
   private final ToyRepository repository;
   private final ToyMapper mapper;
   private final BrandRepository brandRepository;
   private final CategoryRepository categoryRepository;
   private final OrderItemRepository orderItemRepository;
+
   private final Map<ToySearchKey, Page<ToyResponseDto>> cache = new HashMap<>();
 
   public ToyServiceImpl(ToyRepository repository,
@@ -75,12 +78,12 @@ public class ToyServiceImpl implements ToyService {
   public ToyResponseDto createToy(ToyRequestDto dto) {
 
     Brand brand = brandRepository.findById(dto.getBrandId())
-        .orElseThrow(() -> new IllegalArgumentException("Brand not found"));
+        .orElseThrow(() -> new AppException("Brand not found", 404));
 
     Set<Category> categories = dto.getCategoryIds()
         .stream()
         .map(id -> categoryRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("Category not found")))
+            .orElseThrow(() -> new AppException("Category not found", 404)))
         .collect(Collectors.toSet());
 
     Toy toy = new Toy();
@@ -104,12 +107,12 @@ public class ToyServiceImpl implements ToyService {
         .orElseThrow(this::toyNotFound);
 
     Brand brand = brandRepository.findById(dto.getBrandId())
-        .orElseThrow(() -> new IllegalArgumentException("Brand not found"));
+        .orElseThrow(() -> new AppException("Brand not found", 404));
 
     Set<Category> categories = dto.getCategoryIds()
         .stream()
         .map(catId -> categoryRepository.findById(catId)
-            .orElseThrow(() -> new IllegalArgumentException("Category not found")))
+            .orElseThrow(() -> new AppException("Category not found", 404)))
         .collect(Collectors.toSet());
 
     toy.setName(dto.getName());
@@ -131,18 +134,19 @@ public class ToyServiceImpl implements ToyService {
     Toy toy = repository.findById(id)
         .orElseThrow(this::toyNotFound);
 
-    orderItemRepository.deleteByToy_Id(id);
+    if (orderItemRepository.existsByToy_Id(id)) {
+      throw new AppException("Toy is used in orders and cannot be deleted", 400);
+    }
 
     repository.delete(toy);
-
     cache.clear();
   }
 
-  private IllegalArgumentException toyNotFound() {
-    return new IllegalArgumentException("Toy not found");
+  private AppException toyNotFound() {
+    return new AppException("Toy not found", 404);
   }
 
- @Override
+  @Override
   public Page<ToyResponseDto> getByCategoryAndPrice(
       String category,
       Double minPrice,
