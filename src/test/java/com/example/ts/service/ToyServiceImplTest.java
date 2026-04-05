@@ -397,5 +397,62 @@ class ToyServiceImplTest {
         () -> service.updateToy(999L, dto));
   }
 
+  @Test
+  void bulk_noTx_error_firstElement() {
+    ToyRequestDto bad = new ToyRequestDto();
+    bad.setName("ERROR");
+
+    List<ToyRequestDto> list = List.of(bad, dto);
+
+    assertThrows(AppException.class,
+        () -> service.createToysBulkNoTx(list));
+  }
+
+  @Test
+  void bulk_tx_error_firstElement() {
+    ToyRequestDto bad = new ToyRequestDto();
+    bad.setName("ERROR");
+
+    List<ToyRequestDto> list = List.of(bad, dto);
+
+    assertThrows(AppException.class,
+        () -> service.createToysBulkTx(list));
+  }
+
+  @Test
+  void bulk_noTx_fullBranchCoverage() {
+    ToyRequestDto ok = dto;
+
+    ToyRequestDto bad = new ToyRequestDto();
+    bad.setName("ERROR");
+
+    when(brandRepository.findById(1L)).thenReturn(Optional.of(brand));
+    when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
+    when(repository.save(any())).thenReturn(toy);
+    when(mapper.toDto(any())).thenReturn(new ToyResponseDto());
+
+    List<ToyRequestDto> list = List.of(ok, bad);
+
+    assertThrows(AppException.class,
+        () -> service.createToysBulkNoTx(list));
+  }
+
+  @Test
+  void bulk_tx_fullBranchCoverage() {
+    ToyRequestDto ok = dto;
+
+    ToyRequestDto bad = new ToyRequestDto();
+    bad.setName("ERROR");
+
+    when(brandRepository.findById(1L)).thenReturn(Optional.of(brand));
+    when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
+    when(repository.save(any())).thenReturn(toy);
+    when(mapper.toDto(any())).thenReturn(new ToyResponseDto());
+
+    List<ToyRequestDto> list = List.of(ok, bad);
+
+    assertThrows(AppException.class,
+        () -> service.createToysBulkTx(list));
+  }
 
 }
