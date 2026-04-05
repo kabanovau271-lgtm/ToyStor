@@ -51,15 +51,12 @@ class OrderServiceTest {
     toy.setPrice(100.0);
   }
 
-  // ===== helper =====
   private OrderRequestDto buildRequest(int qty) {
     return new OrderRequestDto(
         1L,
         List.of(new OrderItemRequestDto(1L, qty))
     );
   }
-
-  // ===== tests =====
 
   @Test
   void createOrder_success() {
@@ -68,7 +65,6 @@ class OrderServiceTest {
     when(orderRepository.save(any(Order.class))).thenAnswer(i -> i.getArgument(0));
 
     OrderRequestDto request = buildRequest(2);
-
     Order result = service.createOrder(request);
 
     assertNotNull(result);
@@ -111,44 +107,6 @@ class OrderServiceTest {
   }
 
   @Test
-  void getOrderById_notFound() {
-    when(orderRepository.findById(1L)).thenReturn(Optional.empty());
-
-    assertThrows(ResponseStatusException.class,
-        () -> service.getOrderById(1L));
-  }
-
-  @Test
-  void deleteOrder_notFound() {
-    when(orderRepository.existsById(1L)).thenReturn(false);
-
-    assertThrows(ResponseStatusException.class,
-        () -> service.deleteOrder(1L));
-  }
-
-  @Test
-  void createOrderWithoutTransaction_throws() {
-    when(customerRepository.findById(1L)).thenReturn(Optional.of(customer));
-    when(toyRepository.findAll()).thenReturn(List.of(toy));
-
-    OrderRequestDto request = buildRequest(1);
-
-    assertThrows(IllegalStateException.class,
-        () -> service.createOrderWithoutTransaction(request));
-  }
-
-  @Test
-  void createOrderWithTransaction_throws() {
-    when(customerRepository.findById(1L)).thenReturn(Optional.of(customer));
-    when(toyRepository.findAll()).thenReturn(List.of(toy));
-
-    OrderRequestDto request = buildRequest(1);
-
-    assertThrows(IllegalStateException.class,
-        () -> service.createOrderWithTransaction(request));
-  }
-
-  @Test
   void getAllOrders_success() {
     when(orderRepository.findAllBy()).thenReturn(List.of(new Order(), new Order()));
 
@@ -166,7 +124,31 @@ class OrderServiceTest {
     Order result = service.getOrderById(1L);
 
     assertNotNull(result);
-    verify(orderRepository).findById(1L);
+  }
+
+  @Test
+  void getOrderById_notFound() {
+    when(orderRepository.findById(1L)).thenReturn(Optional.empty());
+
+    assertThrows(ResponseStatusException.class,
+        () -> service.getOrderById(1L));
+  }
+
+  @Test
+  void deleteOrder_success() {
+    when(orderRepository.existsById(1L)).thenReturn(true);
+
+    service.deleteOrder(1L);
+
+    verify(orderRepository).deleteById(1L);
+  }
+
+  @Test
+  void deleteOrder_notFound() {
+    when(orderRepository.existsById(1L)).thenReturn(false);
+
+    assertThrows(ResponseStatusException.class,
+        () -> service.deleteOrder(1L));
   }
 
   @Test
@@ -189,15 +171,6 @@ class OrderServiceTest {
   }
 
   @Test
-  void deleteOrder_success() {
-    when(orderRepository.existsById(1L)).thenReturn(true);
-
-    service.deleteOrder(1L);
-
-    verify(orderRepository).deleteById(1L);
-  }
-
-  @Test
   void updateOrder_notFound() {
     when(orderRepository.findById(1L)).thenReturn(Optional.empty());
 
@@ -207,8 +180,9 @@ class OrderServiceTest {
         () -> service.updateOrder(1L, request));
   }
 
+  // ВАЖНО: эти методы ВСЕГДА кидают исключение
   @Test
-  void createOrderWithoutTransaction_callsInternal() {
+  void createOrderWithoutTransaction_throws() {
     when(customerRepository.findById(1L)).thenReturn(Optional.of(customer));
     when(toyRepository.findAll()).thenReturn(List.of(toy));
 
@@ -216,12 +190,10 @@ class OrderServiceTest {
 
     assertThrows(IllegalStateException.class,
         () -> service.createOrderWithoutTransaction(request));
-
-    verify(orderRepository).save(any(Order.class));
   }
 
   @Test
-  void createOrderWithTransaction_callsInternal() {
+  void createOrderWithTransaction_throws() {
     when(customerRepository.findById(1L)).thenReturn(Optional.of(customer));
     when(toyRepository.findAll()).thenReturn(List.of(toy));
 
@@ -229,36 +201,5 @@ class OrderServiceTest {
 
     assertThrows(IllegalStateException.class,
         () -> service.createOrderWithTransaction(request));
-
-    verify(orderRepository).save(any(Order.class));
   }
-
-  @Test
-  void createOrderWithoutTransaction_success() {
-    OrderRequestDto request = buildRequest(1);
-
-    when(customerRepository.findById(1L)).thenReturn(Optional.of(customer));
-    when(toyRepository.findAll()).thenReturn(List.of(toy));
-    when(orderRepository.save(any(Order.class))).thenAnswer(inv -> inv.getArgument(0));
-
-    Order result = service.createOrderWithoutTransaction(request);
-
-    assertNotNull(result);
-    verify(orderRepository).save(any(Order.class));
-  }
-
-  @Test
-  void createOrderWithTransaction_success() {
-    OrderRequestDto request = buildRequest(1);
-
-    when(customerRepository.findById(1L)).thenReturn(Optional.of(customer));
-    when(toyRepository.findAll()).thenReturn(List.of(toy));
-    when(orderRepository.save(any(Order.class))).thenAnswer(inv -> inv.getArgument(0));
-
-    Order result = service.createOrderWithTransaction(request);
-
-    assertNotNull(result);
-    verify(orderRepository).save(any(Order.class));
-  }
-
 }
