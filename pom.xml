@@ -26,9 +26,13 @@
             target/site/jacoco/jacoco.xml
         </sonar.coverage.jacoco.xmlReportPaths>
 
+        <!-- ВОТ ЭТО ДОБАВИЛИ -->
+        <sonar.inclusions>
+            src/main/java/com/example/ts/service/**
+        </sonar.inclusions>
+
         <kotlin.version>2.2.20</kotlin.version>
     </properties>
-
     <dependencies>
 
         <!-- WEB -->
