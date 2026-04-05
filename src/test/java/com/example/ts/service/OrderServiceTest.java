@@ -204,4 +204,15 @@ class OrderServiceTest {
 
     assertThrows(IllegalStateException.class, action);
   }
+
+  @Test
+  void createOrderWithoutTransaction_success() {
+    when(customerRepository.findById(1L)).thenReturn(Optional.of(customer));
+    when(toyRepository.findAll()).thenReturn(List.of(toy));
+    when(orderRepository.save(any(Order.class))).thenAnswer(i -> i.getArgument(0));
+
+    Order result = service.createOrderWithoutTransaction(buildRequest(1));
+
+    assertNotNull(result);
+  }
 }
