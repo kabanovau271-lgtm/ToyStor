@@ -353,4 +353,47 @@ class ToyServiceImplTest {
         .findByCategoryAndPrice(any(), any(), any());
   }
 
+  @Test
+  void bulk_mixed_errorInsideStream() {
+    ToyRequestDto bad = new ToyRequestDto();
+    bad.setName("OK");
+    bad.setBrandId(1L);
+    bad.setCategoryIds(Set.of(1L));
+
+    when(brandRepository.findById(1L))
+        .thenReturn(Optional.of(brand));
+    when(categoryRepository.findById(1L))
+        .thenReturn(Optional.empty()); // ошибка внутри stream
+
+    List<ToyRequestDto> list = List.of(dto, bad);
+
+    assertThrows(AppException.class,
+        () -> service.createToysBulk(list));
+  }
+
+  @Test
+  void cache_hit_returnsSameObject() {
+    Page<Toy> page = new PageImpl<>(List.of(toy));
+    ToyResponseDto dtoResp = new ToyResponseDto();
+
+    when(repository.findByCategoryAndPrice(any(), any(), any()))
+        .thenReturn(page);
+    when(mapper.toDto(any())).thenReturn(dtoResp);
+
+    Page<ToyResponseDto> first =
+        service.getByCategoryAndPrice("cat", 10.0, 0, 10);
+
+    Page<ToyResponseDto> second =
+        service.getByCategoryAndPrice("cat", 10.0, 0, 10);
+
+    assertSame(first, second); // ВАЖНО
+  }
+
+  @Test
+  void toyNotFound_privateMethodCovered() {
+    when(repository.findById(999L)).thenReturn(Optional.empty());
+
+    assertThrows(AppException.class,
+        () -> service.updateToy(999L, dto));
+  }
 }
