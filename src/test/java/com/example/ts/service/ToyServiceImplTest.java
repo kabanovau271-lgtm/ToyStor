@@ -332,10 +332,16 @@ class ToyServiceImplTest {
 
   @Test
   void createToy_clearsCache() {
+    Page<Toy> page = new PageImpl<>(List.of(toy));
+    ToyResponseDto dtoResp = new ToyResponseDto();
+
+    when(repository.findByCategoryAndPrice(any(), any(), any()))
+        .thenReturn(page, page); // ВАЖНО: 2 раза!
+    when(mapper.toDto(any())).thenReturn(dtoResp);
+
     when(brandRepository.findById(1L)).thenReturn(Optional.of(brand));
     when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
     when(repository.save(any())).thenReturn(toy);
-    when(mapper.toDto(any())).thenReturn(new ToyResponseDto());
 
     service.getByCategoryAndPrice("cat", 10.0, 0, 10);
 
