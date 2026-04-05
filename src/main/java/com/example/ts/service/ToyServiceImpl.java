@@ -1,5 +1,6 @@
 package com.example.ts.service;
 
+import com.example.ts.cache.ToySearchKey;
 import com.example.ts.domain.Brand;
 import com.example.ts.domain.Category;
 import com.example.ts.domain.Toy;
@@ -11,14 +12,11 @@ import com.example.ts.repository.BrandRepository;
 import com.example.ts.repository.CategoryRepository;
 import com.example.ts.repository.OrderItemRepository;
 import com.example.ts.repository.ToyRepository;
-import com.example.ts.cache.ToySearchKey;
-
 import java.util.HashMap;
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
