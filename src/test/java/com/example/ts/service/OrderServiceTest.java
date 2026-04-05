@@ -220,4 +220,17 @@ class OrderServiceTest {
 
     assertNotNull(result);
   }
+
+  @Test
+  void createOrderWithTransaction_success() {
+    toy.setQuantity(5); // 👈 чтобы НЕ было exception
+
+    when(customerRepository.findById(1L)).thenReturn(Optional.of(customer));
+    when(toyRepository.findAll()).thenReturn(List.of(toy));
+    when(orderRepository.save(any(Order.class))).thenAnswer(i -> i.getArgument(0));
+
+    Order result = service.createOrderWithTransaction(buildRequest(1));
+
+    assertNotNull(result);
+  }
 }
