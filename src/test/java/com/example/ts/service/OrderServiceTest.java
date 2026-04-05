@@ -196,4 +196,41 @@ class OrderServiceTest {
 
     verify(orderRepository).deleteById(1L);
   }
+
+  @Test
+  void updateOrder_notFound() {
+    when(orderRepository.findById(1L)).thenReturn(Optional.empty());
+
+    OrderRequestDto request = buildRequest(1);
+
+    assertThrows(ResponseStatusException.class,
+        () -> service.updateOrder(1L, request));
+  }
+
+  @Test
+  void createOrderWithoutTransaction_callsInternal() {
+    when(customerRepository.findById(1L)).thenReturn(Optional.of(customer));
+    when(toyRepository.findAll()).thenReturn(List.of(toy));
+
+    OrderRequestDto request = buildRequest(1);
+
+    assertThrows(IllegalStateException.class,
+        () -> service.createOrderWithoutTransaction(request));
+
+    verify(orderRepository).save(any(Order.class));
+  }
+
+  @Test
+  void createOrderWithTransaction_callsInternal() {
+    when(customerRepository.findById(1L)).thenReturn(Optional.of(customer));
+    when(toyRepository.findAll()).thenReturn(List.of(toy));
+
+    OrderRequestDto request = buildRequest(1);
+
+    assertThrows(IllegalStateException.class,
+        () -> service.createOrderWithTransaction(request));
+
+    verify(orderRepository).save(any(Order.class));
+  }
+
 }
