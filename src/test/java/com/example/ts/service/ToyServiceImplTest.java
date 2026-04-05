@@ -11,24 +11,15 @@ import com.example.ts.repository.BrandRepository;
 import com.example.ts.repository.CategoryRepository;
 import com.example.ts.repository.OrderItemRepository;
 import com.example.ts.repository.ToyRepository;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import org.mockito.*;
+import org.springframework.data.domain.*;
+
+import java.util.*;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 class ToyServiceImplTest {
 
@@ -40,9 +31,9 @@ class ToyServiceImplTest {
 
   @InjectMocks private ToyServiceImpl service;
 
+  private Toy toy;
   private Brand brand;
   private Category category;
-  private Toy toy;
   private ToyRequestDto dto;
 
   @BeforeEach
@@ -74,7 +65,10 @@ class ToyServiceImplTest {
     when(repository.findAllWithCategories()).thenReturn(List.of(toy));
     when(mapper.toDto(any())).thenReturn(new ToyResponseDto());
 
-    assertEquals(1, service.getAllToys().size());
+    List<ToyResponseDto> result = service.getAllToys();
+
+    assertEquals(1, result.size());
+    verify(repository).findAllWithCategories();
   }
 
   @Test
@@ -88,6 +82,7 @@ class ToyServiceImplTest {
   @Test
   void getToyById_notFound() {
     when(repository.findByIdWithCategories(1L)).thenReturn(Optional.empty());
+
     assertThrows(AppException.class, () -> service.getToyById(1L));
   }
 
@@ -114,6 +109,7 @@ class ToyServiceImplTest {
   @Test
   void createToy_brandNotFound() {
     when(brandRepository.findById(1L)).thenReturn(Optional.empty());
+
     assertThrows(AppException.class, () -> service.createToy(dto));
   }
 
@@ -121,6 +117,7 @@ class ToyServiceImplTest {
   void createToy_categoryNotFound() {
     when(brandRepository.findById(1L)).thenReturn(Optional.of(brand));
     when(categoryRepository.findById(1L)).thenReturn(Optional.empty());
+
     assertThrows(AppException.class, () -> service.createToy(dto));
   }
 
@@ -140,6 +137,24 @@ class ToyServiceImplTest {
   @Test
   void updateToy_notFound() {
     when(repository.findById(1L)).thenReturn(Optional.empty());
+
+    assertThrows(AppException.class, () -> service.updateToy(1L, dto));
+  }
+
+  @Test
+  void updateToy_brandNotFound() {
+    when(repository.findById(1L)).thenReturn(Optional.of(toy));
+    when(brandRepository.findById(1L)).thenReturn(Optional.empty());
+
+    assertThrows(AppException.class, () -> service.updateToy(1L, dto));
+  }
+
+  @Test
+  void updateToy_categoryNotFound() {
+    when(repository.findById(1L)).thenReturn(Optional.of(toy));
+    when(brandRepository.findById(1L)).thenReturn(Optional.of(brand));
+    when(categoryRepository.findById(1L)).thenReturn(Optional.empty());
+
     assertThrows(AppException.class, () -> service.updateToy(1L, dto));
   }
 
@@ -218,9 +233,10 @@ class ToyServiceImplTest {
     ToyRequestDto bad = new ToyRequestDto();
     bad.setName("ERROR");
 
-    Executable executable = () -> service.createToysBulkNoTx(List.of(dto, bad));
+    List<ToyRequestDto> list = List.of(dto, bad);
 
-    assertThrows(AppException.class, executable);
+    assertThrows(AppException.class,
+        () -> service.createToysBulkNoTx(list));
   }
 
   @Test
@@ -228,8 +244,9 @@ class ToyServiceImplTest {
     ToyRequestDto bad = new ToyRequestDto();
     bad.setName("ERROR");
 
-    Executable executable = () -> service.createToysBulkTx(List.of(dto, bad));
+    List<ToyRequestDto> list = List.of(dto, bad);
 
-    assertThrows(AppException.class, executable);
+    assertThrows(AppException.class,
+        () -> service.createToysBulkTx(list));
   }
 }
