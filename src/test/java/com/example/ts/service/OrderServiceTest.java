@@ -147,4 +147,53 @@ class OrderServiceTest {
     assertThrows(IllegalStateException.class,
         () -> service.createOrderWithTransaction(request));
   }
+
+  @Test
+  void getAllOrders_success() {
+    when(orderRepository.findAllBy()).thenReturn(List.of(new Order(), new Order()));
+
+    List<Order> result = service.getAllOrders();
+
+    assertEquals(2, result.size());
+    verify(orderRepository).findAllBy();
+  }
+
+  @Test
+  void getOrderById_success() {
+    Order order = new Order();
+    when(orderRepository.findById(1L)).thenReturn(Optional.of(order));
+
+    Order result = service.getOrderById(1L);
+
+    assertNotNull(result);
+    verify(orderRepository).findById(1L);
+  }
+
+  @Test
+  void updateOrder_success() {
+    Order order = new Order();
+    order.setItems(new java.util.ArrayList<>());
+
+    when(orderRepository.findById(1L)).thenReturn(Optional.of(order));
+    when(customerRepository.findById(1L)).thenReturn(Optional.of(customer));
+    when(toyRepository.findById(1L)).thenReturn(Optional.of(toy));
+    when(orderRepository.save(any(Order.class))).thenAnswer(i -> i.getArgument(0));
+
+    OrderRequestDto request = buildRequest(2);
+
+    Order result = service.updateOrder(1L, request);
+
+    assertNotNull(result);
+    assertEquals(1, result.getItems().size());
+    verify(orderRepository).save(order);
+  }
+
+  @Test
+  void deleteOrder_success() {
+    when(orderRepository.existsById(1L)).thenReturn(true);
+
+    service.deleteOrder(1L);
+
+    verify(orderRepository).deleteById(1L);
+  }
 }
