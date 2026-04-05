@@ -233,4 +233,32 @@ class OrderServiceTest {
     verify(orderRepository).save(any(Order.class));
   }
 
+  @Test
+  void createOrderWithoutTransaction_success() {
+    OrderRequestDto request = buildRequest(1);
+
+    when(customerRepository.findById(1L)).thenReturn(Optional.of(customer));
+    when(toyRepository.findAll()).thenReturn(List.of(toy));
+    when(orderRepository.save(any(Order.class))).thenAnswer(inv -> inv.getArgument(0));
+
+    Order result = service.createOrderWithoutTransaction(request);
+
+    assertNotNull(result);
+    verify(orderRepository).save(any(Order.class));
+  }
+
+  @Test
+  void createOrderWithTransaction_success() {
+    OrderRequestDto request = buildRequest(1);
+
+    when(customerRepository.findById(1L)).thenReturn(Optional.of(customer));
+    when(toyRepository.findAll()).thenReturn(List.of(toy));
+    when(orderRepository.save(any(Order.class))).thenAnswer(inv -> inv.getArgument(0));
+
+    Order result = service.createOrderWithTransaction(request);
+
+    assertNotNull(result);
+    verify(orderRepository).save(any(Order.class));
+  }
+
 }
