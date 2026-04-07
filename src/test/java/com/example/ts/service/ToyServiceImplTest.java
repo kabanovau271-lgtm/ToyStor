@@ -283,8 +283,7 @@ class ToyServiceImplTest {
     when(brandRepository.findById(1L)).thenReturn(Optional.of(brand));
     when(categoryRepository.findById(1L)).thenReturn(Optional.empty());
 
-    List<ToyRequestDto> list = List.of(dto); // ВНЕ lambda
-
+    List<ToyRequestDto> list = List.of(dto);
     assertThrows(AppException.class,
         () -> service.createToysBulk(list));
   }
@@ -293,7 +292,7 @@ class ToyServiceImplTest {
   void bulk_brandNotFound() {
     when(brandRepository.findById(1L)).thenReturn(Optional.empty());
 
-    List<ToyRequestDto> list = List.of(dto); // ВНЕ lambda
+    List<ToyRequestDto> list = List.of(dto);
 
     assertThrows(AppException.class,
         () -> service.createToysBulk(list));
@@ -324,7 +323,7 @@ class ToyServiceImplTest {
     ToyResponseDto dtoResp = new ToyResponseDto();
 
     when(repository.findByCategoryAndPrice(any(), any(), any()))
-        .thenReturn(page, page); // ВАЖНО: 2 раза!
+        .thenReturn(page, page);
     when(mapper.toDto(any())).thenReturn(dtoResp);
 
     when(brandRepository.findById(1L)).thenReturn(Optional.of(brand));
@@ -351,7 +350,7 @@ class ToyServiceImplTest {
     when(brandRepository.findById(1L))
         .thenReturn(Optional.of(brand));
     when(categoryRepository.findById(1L))
-        .thenReturn(Optional.empty()); // ошибка внутри stream
+        .thenReturn(Optional.empty());
 
     List<ToyRequestDto> list = List.of(dto, bad);
 
@@ -374,7 +373,7 @@ class ToyServiceImplTest {
     Page<ToyResponseDto> second =
         service.getByCategoryAndPrice("cat", 10.0, 0, 10);
 
-    assertSame(first, second); // ВАЖНО
+    assertSame(first, second);
   }
 
   @Test
