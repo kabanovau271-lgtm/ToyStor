@@ -36,8 +36,6 @@ class BrandServiceImplTest {
     dto.setName("Lego");
   }
 
-  // ================= GET ALL =================
-
   @Test
   void getAllBrands() {
     when(repository.findAll()).thenReturn(List.of(brand));
@@ -48,8 +46,6 @@ class BrandServiceImplTest {
     assertEquals(1, result.size());
     verify(repository).findAll();
   }
-
-  // ================= GET BY ID =================
 
   @Test
   void getBrandById_success() {
@@ -69,8 +65,6 @@ class BrandServiceImplTest {
         () -> service.getBrandById(1L));
   }
 
-  // ================= CREATE =================
-
   @Test
   void createBrand() {
     when(mapper.toEntity(dto)).thenReturn(brand);
@@ -82,8 +76,6 @@ class BrandServiceImplTest {
     assertNotNull(result);
     verify(repository).save(brand);
   }
-
-  // ================= UPDATE =================
 
   @Test
   void updateBrand_success() {
@@ -104,8 +96,6 @@ class BrandServiceImplTest {
     assertThrows(IllegalArgumentException.class,
         () -> service.updateBrand(1L, dto));
   }
-
-  // ================= DELETE =================
 
   @Test
   void deleteBrand_success() {

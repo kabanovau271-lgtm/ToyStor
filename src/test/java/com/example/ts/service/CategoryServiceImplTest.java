@@ -36,8 +36,6 @@ class CategoryServiceImplTest {
     dto.setName("Cars");
   }
 
-  // ================= GET ALL =================
-
   @Test
   void getAllCategories() {
     when(repository.findAll()).thenReturn(List.of(category));
@@ -48,8 +46,6 @@ class CategoryServiceImplTest {
     assertEquals(1, result.size());
     verify(repository).findAll();
   }
-
-  // ================= GET BY ID =================
 
   @Test
   void getCategoryById_success() {
@@ -69,8 +65,6 @@ class CategoryServiceImplTest {
         () -> service.getCategoryById(1L));
   }
 
-  // ================= CREATE =================
-
   @Test
   void createCategory() {
     when(mapper.toEntity(dto)).thenReturn(category);
@@ -82,8 +76,6 @@ class CategoryServiceImplTest {
     assertNotNull(result);
     verify(repository).save(category);
   }
-
-  // ================= UPDATE =================
 
   @Test
   void updateCategory_success() {
@@ -104,8 +96,6 @@ class CategoryServiceImplTest {
     assertThrows(IllegalArgumentException.class,
         () -> service.updateCategory(1L, dto));
   }
-
-  // ================= DELETE =================
 
   @Test
   void deleteCategory() {

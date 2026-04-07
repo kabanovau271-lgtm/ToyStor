@@ -59,8 +59,6 @@ class OrderServiceTest {
     );
   }
 
-  // ===== CREATE =====
-
   @Test
   void createOrder_success() {
     when(customerRepository.findById(1L)).thenReturn(Optional.of(customer));
@@ -104,8 +102,6 @@ class OrderServiceTest {
     assertThrows(ResponseStatusException.class, action);
   }
 
-  // ===== GET =====
-
   @Test
   void getAllOrders_success() {
     when(orderRepository.findAllBy()).thenReturn(List.of(new Order(), new Order()));
@@ -134,8 +130,6 @@ class OrderServiceTest {
     assertThrows(ResponseStatusException.class, action);
   }
 
-  // ===== UPDATE =====
-
   @Test
   void updateOrder_success() {
     Order order = new Order();
@@ -161,8 +155,6 @@ class OrderServiceTest {
     assertThrows(ResponseStatusException.class, action);
   }
 
-  // ===== DELETE =====
-
   @Test
   void deleteOrder_success() {
     when(orderRepository.existsById(1L)).thenReturn(true);
@@ -181,12 +173,9 @@ class OrderServiceTest {
     assertThrows(ResponseStatusException.class, action);
   }
 
-  // ===== TRANSACTION METHODS =====
-
-
   @Test
   void createOrderWithoutTransaction_shouldThrowException() {
-    toy.setQuantity(0); // 👈 ВАЖНО
+    toy.setQuantity(0);
 
     when(customerRepository.findById(1L)).thenReturn(Optional.of(customer));
     when(toyRepository.findAll()).thenReturn(List.of(toy));
@@ -199,7 +188,7 @@ class OrderServiceTest {
 
   @Test
   void createOrderWithTransaction_shouldThrowException() {
-    toy.setQuantity(0); // 👈 ВАЖНО
+    toy.setQuantity(0);
 
     when(customerRepository.findById(1L)).thenReturn(Optional.of(customer));
     when(toyRepository.findAll()).thenReturn(List.of(toy));
@@ -223,7 +212,7 @@ class OrderServiceTest {
 
   @Test
   void createOrderWithTransaction_success() {
-    toy.setQuantity(5); // 👈 чтобы НЕ было exception
+    toy.setQuantity(5);
 
     when(customerRepository.findById(1L)).thenReturn(Optional.of(customer));
     when(toyRepository.findAll()).thenReturn(List.of(toy));

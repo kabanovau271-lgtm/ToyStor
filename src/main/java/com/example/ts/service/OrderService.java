@@ -95,7 +95,6 @@ public class OrderService {
     Toy toy = toyRepository.findAll().get(0);
     toy.setQuantity(toy.getQuantity() - 1);
 
-    // 👇 ДОБАВЬ УСЛОВИЕ
     if (toy.getQuantity() < 0) {
       throw new IllegalStateException("Transaction rollback demo");
     }

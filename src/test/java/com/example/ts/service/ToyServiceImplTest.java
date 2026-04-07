@@ -58,8 +58,6 @@ class ToyServiceImplTest {
     dto.setCategoryIds(Set.of(1L));
   }
 
-  // ================= READ =================
-
   @Test
   void getAllToys() {
     when(repository.findAllWithCategories()).thenReturn(List.of(toy));
@@ -94,8 +92,6 @@ class ToyServiceImplTest {
     assertEquals(1, service.getToysByName("Lego").size());
   }
 
-  // ================= CREATE =================
-
   @Test
   void createToy_success() {
     when(brandRepository.findById(1L)).thenReturn(Optional.of(brand));
@@ -120,8 +116,6 @@ class ToyServiceImplTest {
 
     assertThrows(AppException.class, () -> service.createToy(dto));
   }
-
-  // ================= UPDATE =================
 
   @Test
   void updateToy_success() {
@@ -158,8 +152,6 @@ class ToyServiceImplTest {
     assertThrows(AppException.class, () -> service.updateToy(1L, dto));
   }
 
-  // ================= DELETE =================
-
   @Test
   void deleteToy_success() {
     when(repository.findById(1L)).thenReturn(Optional.of(toy));
@@ -184,8 +176,6 @@ class ToyServiceImplTest {
 
     assertThrows(AppException.class, () -> service.deleteToy(1L));
   }
-
-  // ================= CACHE =================
 
   @Test
   void getByCategoryAndPrice_cacheMissAndHit() {
@@ -214,8 +204,6 @@ class ToyServiceImplTest {
         service.getByCategoryAndPriceNative("cat", 10.0, 0, 10)
             .getContent().size());
   }
-
-  // ================= BULK =================
 
   @Test
   void bulk_success() {

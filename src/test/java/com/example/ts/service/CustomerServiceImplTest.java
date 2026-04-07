@@ -29,8 +29,6 @@ class CustomerServiceImplTest {
     customer.setName("John");
   }
 
-  // ================= CREATE =================
-
   @Test
   void create() {
     when(repository.save(customer)).thenReturn(customer);
@@ -41,8 +39,6 @@ class CustomerServiceImplTest {
     verify(repository).save(customer);
   }
 
-  // ================= GET ALL =================
-
   @Test
   void getAll() {
     when(repository.findAll()).thenReturn(List.of(customer));
@@ -52,8 +48,6 @@ class CustomerServiceImplTest {
     assertEquals(1, result.size());
     verify(repository).findAll();
   }
-
-  // ================= GET BY ID =================
 
   @Test
   void getById_success() {
@@ -71,8 +65,6 @@ class CustomerServiceImplTest {
     assertThrows(RuntimeException.class,
         () -> service.getById(1L));
   }
-
-  // ================= DELETE =================
 
   @Test
   void deleteCustomer() {
