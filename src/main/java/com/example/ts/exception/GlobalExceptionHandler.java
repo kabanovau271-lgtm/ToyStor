@@ -18,7 +18,6 @@ public class GlobalExceptionHandler {
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   @ResponseBody
   public ErrorResponse handleValidation(MethodArgumentNotValidException ex) {
-    // Одна короткая строка
     log.error("Validation error: BAD_REQUEST (400)");
 
     String message = ex.getBindingResult()
