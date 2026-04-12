@@ -114,6 +114,7 @@ public class ToyController {
     return service.createToysBulkNoTx(dtos);
   }
 
+
   @Operation(summary = "Bulk с транзакцией")
   @PostMapping("/bulk-tx")
   public List<ToyResponseDto> bulkTx(@RequestBody List<ToyRequestDto> dtos) {
