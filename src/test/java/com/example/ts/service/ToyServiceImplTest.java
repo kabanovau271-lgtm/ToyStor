@@ -451,5 +451,19 @@ class ToyServiceImplTest {
         () -> service.createToysBulkTx(list));
   }
 
+  @Test
+  void getAllToysPaged_success() {
+    Page<Toy> page = new PageImpl<>(List.of(toy));
+
+    when(repository.findAll(any(org.springframework.data.domain.Pageable.class)))
+        .thenReturn(page);
+    when(mapper.toDto(any())).thenReturn(new ToyResponseDto());
+
+    Page<ToyResponseDto> result = service.getAllToysPaged(0, 10);
+
+    assertNotNull(result);
+    assertEquals(1, result.getContent().size());
+
+    verify(repository).findAll(any(org.springframework.data.domain.Pageable.class));  }
 
 }
