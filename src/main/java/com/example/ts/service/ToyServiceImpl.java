@@ -171,6 +171,14 @@ public class ToyServiceImpl implements ToyService {
   }
 
   @Override
+  public Page<ToyResponseDto> getAllToysPaged(int page, int size) {
+    Page<Toy> toys = repository.findAll(
+        PageRequest.of(page, size, org.springframework.data.domain.Sort.by("id"))
+    );
+    return toys.map(mapper::toDto);
+  }
+
+  @Override
   public List<ToyResponseDto> createToysBulk(List<ToyRequestDto> dtos) {
 
     return dtos.stream()
@@ -243,3 +251,4 @@ public class ToyServiceImpl implements ToyService {
     return new AppException(TOY_NOT_FOUND, 404);
   }
 }
+

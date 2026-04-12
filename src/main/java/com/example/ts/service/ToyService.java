@@ -36,4 +36,5 @@ public interface ToyService {
   List<ToyResponseDto> createToysBulk(List<ToyRequestDto> dto);
   public List<ToyResponseDto> createToysBulkNoTx(List<ToyRequestDto> dto);
   public List<ToyResponseDto> createToysBulkTx(List<ToyRequestDto> dto);
+  Page<ToyResponseDto> getAllToysPaged(int page, int size);
 }

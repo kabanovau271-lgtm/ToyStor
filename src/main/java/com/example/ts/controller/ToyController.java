@@ -11,15 +11,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import org.springframework.data.domain.Page;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Игрушки", description = "API для управления игрушками")
 @RestController
@@ -34,8 +26,14 @@ public class ToyController {
 
   @Operation(summary = "Получить все игрушки")
   @GetMapping
-  public List<ToyResponseDto> getAll() {
-    return service.getAllToys();
+  public Page<ToyResponseDto> getAll(
+      @Parameter(description = "Номер страницы (>=0)")
+      @RequestParam(defaultValue = "0") @Min(0) int page,
+
+      @Parameter(description = "Размер страницы (1-50)")
+      @RequestParam(defaultValue = "10") @Min(1) @Max(50) int size
+  ) {
+    return service.getAllToysPaged(page, size);
   }
 
   @Operation(summary = "Получить игрушку по ID")
@@ -76,10 +74,10 @@ public class ToyController {
   @Operation(summary = "Фильтр по категории и цене (JPQL)")
   @GetMapping("/filter")
   public Page<ToyResponseDto> filter(
-      @Parameter(description = "Категория") @RequestParam String category,
-      @Parameter(description = "Минимальная цена") @RequestParam Double minPrice,
-      @Parameter(description = "Номер страницы (>=0)") @RequestParam @Min(0) int page,
-      @Parameter(description = "Размер страницы (1-50)") @RequestParam @Min(1) @Max(50) int size
+      @RequestParam String category,
+      @RequestParam Double minPrice,
+      @RequestParam @Min(0) int page,
+      @RequestParam @Min(1) @Max(50) int size
   ) {
     return service.getByCategoryAndPrice(category, minPrice, page, size);
   }
@@ -87,10 +85,10 @@ public class ToyController {
   @Operation(summary = "Фильтр по категории и цене (Native SQL)")
   @GetMapping("/filter-native")
   public Page<ToyResponseDto> filterNative(
-      @Parameter(description = "Категория") @RequestParam String category,
-      @Parameter(description = "Минимальная цена") @RequestParam Double minPrice,
-      @Parameter(description = "Номер страницы (>=0)") @RequestParam @Min(0) int page,
-      @Parameter(description = "Размер страницы (1-50)") @RequestParam @Min(1) @Max(50) int size
+      @RequestParam String category,
+      @RequestParam Double minPrice,
+      @RequestParam @Min(0) int page,
+      @RequestParam @Min(1) @Max(50) int size
   ) {
     return service.getByCategoryAndPriceNative(category, minPrice, page, size);
   }
@@ -99,23 +97,16 @@ public class ToyController {
   @PostMapping("/bulk")
   public List<ToyResponseDto> createBulk(
       @Valid @RequestBody List<ToyRequestDto> dtos) {
-
     return service.createToysBulk(dtos);
   }
 
-  @Operation(
-      summary = "Bulk создание игрушек без транзакции",
-      description = "Создаёт несколько игрушек. При ошибке часть данных может сохраниться"
-  )
+  @Operation(summary = "Bulk без транзакции")
   @PostMapping("/bulk-no-tx")
   public List<ToyResponseDto> bulkNoTx(@RequestBody List<ToyRequestDto> dtos) {
     return service.createToysBulkNoTx(dtos);
   }
 
-  @Operation(
-      summary = "Bulk создание игрушек с транзакцией",
-      description = "Создаёт несколько игрушек. При ошибке происходит rollback (ничего не сохраняется)"
-  )
+  @Operation(summary = "Bulk с транзакцией")
   @PostMapping("/bulk-tx")
   public List<ToyResponseDto> bulkTx(@RequestBody List<ToyRequestDto> dtos) {
     return service.createToysBulkTx(dtos);
