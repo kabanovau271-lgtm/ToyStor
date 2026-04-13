@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import org.springframework.data.domain.Page;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Игрушки", description = "API для управления игрушками")
 @RestController
 @RequestMapping("/toys")
+@Validated
 public class ToyController {
 
   private final ToyService service;
@@ -117,7 +119,7 @@ public class ToyController {
 
   @Operation(summary = "Bulk с транзакцией")
   @PostMapping("/bulk-tx")
-  public List<ToyResponseDto> bulkTx(@RequestBody List<ToyRequestDto> dtos) {
+  public List<ToyResponseDto> bulkTx(@Valid @RequestBody List<@Valid ToyRequestDto> dtos) {
     return service.createToysBulkTx(dtos);
   }
 }
