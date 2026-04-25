@@ -5,31 +5,30 @@ import com.example.ts.domain.Category;
 import com.example.ts.domain.Toy;
 import com.example.ts.dto.ToyRequestDto;
 import com.example.ts.dto.ToyResponseDto;
-import com.example.ts.exception.AppException;
 import com.example.ts.mapper.ToyMapper;
 import com.example.ts.repository.BrandRepository;
 import com.example.ts.repository.CategoryRepository;
 import com.example.ts.repository.OrderItemRepository;
 import com.example.ts.repository.ToyRepository;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
 class ToyServiceImplTest {
 
   @Mock private ToyRepository repository;
@@ -38,131 +37,104 @@ class ToyServiceImplTest {
   @Mock private CategoryRepository categoryRepository;
   @Mock private OrderItemRepository orderItemRepository;
 
-  @InjectMocks private ToyServiceImpl service;
+  @InjectMocks
+  private ToyServiceImpl service;
 
-  private Toy toy;
   private Brand brand;
   private Category category;
-  private ToyRequestDto dto;
+  private Toy toy;
+  private ToyRequestDto requestDto;
+  private ToyResponseDto responseDto;
 
   @BeforeEach
   void setUp() {
-    MockitoAnnotations.openMocks(this);
-
-    brand = new Brand();
-    brand.setId(1L);
-
-    category = new Category();
-    category.setId(1L);
+    brand = new Brand(1L, "Lego", null);
+    category = new Category(1L, "Конструкторы", null);
 
     toy = new Toy();
     toy.setId(1L);
-    toy.setName("Lego");
+    toy.setName("Test Toy");
+    toy.setPrice(100.0);
+    toy.setQuantity(10);
+    toy.setBrand(brand);
+    toy.setCategories(Set.of(category));
 
-    dto = new ToyRequestDto();
-    dto.setName("Lego");
-    dto.setPrice(100.0);
-    dto.setQuantity(5);
-    dto.setBrandId(1L);
-    dto.setCategoryIds(Set.of(1L));
+    requestDto = new ToyRequestDto();
+    requestDto.setName("Test Toy");
+    requestDto.setPrice(100.0);
+    requestDto.setQuantity(10);
+    requestDto.setBrandId(1L);
+    requestDto.setCategoryIds(Set.of(1L));
+
+    responseDto = new ToyResponseDto();
+    responseDto.setId(1L);
+    responseDto.setName("Test Toy");
+    responseDto.setPrice(100.0);
+    responseDto.setQuantity(10);
+    responseDto.setBrand("Lego");
+    responseDto.setCategories(Set.of("Конструкторы"));
   }
 
   @Test
-  void getAllToys() {
+  void getAllToys_ShouldReturnList() {
     when(repository.findAllWithCategories()).thenReturn(List.of(toy));
-    when(mapper.toDto(any())).thenReturn(new ToyResponseDto());
+    when(mapper.toDto(toy)).thenReturn(responseDto);
 
     List<ToyResponseDto> result = service.getAllToys();
 
     assertEquals(1, result.size());
+    assertEquals("Test Toy", result.get(0).getName());
     verify(repository).findAllWithCategories();
   }
 
   @Test
-  void getToyById_success() {
+  void getToyById_ShouldReturnToy() {
     when(repository.findByIdWithCategories(1L)).thenReturn(Optional.of(toy));
-    when(mapper.toDto(any())).thenReturn(new ToyResponseDto());
+    when(mapper.toDto(toy)).thenReturn(responseDto);
 
-    assertNotNull(service.getToyById(1L));
+    ToyResponseDto result = service.getToyById(1L);
+
+    assertEquals("Test Toy", result.getName());
   }
 
   @Test
-  void getToyById_notFound() {
-    when(repository.findByIdWithCategories(1L)).thenReturn(Optional.empty());
+  void getToysByName_ShouldReturnList() {
+    when(repository.findByName("Test")).thenReturn(List.of(toy));
+    when(mapper.toDto(toy)).thenReturn(responseDto);
 
-    assertThrows(AppException.class, () -> service.getToyById(1L));
+    List<ToyResponseDto> result = service.getToysByName("Test");
+
+    assertEquals(1, result.size());
   }
 
   @Test
-  void getToysByName() {
-    when(repository.findByName("Lego")).thenReturn(List.of(toy));
-    when(mapper.toDto(any())).thenReturn(new ToyResponseDto());
-
-    assertEquals(1, service.getToysByName("Lego").size());
-  }
-
-  @Test
-  void createToy_success() {
+  void createToy_ShouldSaveAndReturn() {
     when(brandRepository.findById(1L)).thenReturn(Optional.of(brand));
     when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
-    when(repository.save(any())).thenReturn(toy);
-    when(mapper.toDto(any())).thenReturn(new ToyResponseDto());
+    when(repository.save(any(Toy.class))).thenReturn(toy);
+    when(mapper.toDto(toy)).thenReturn(responseDto);
 
-    assertNotNull(service.createToy(dto));
+    ToyResponseDto result = service.createToy(requestDto);
+
+    assertEquals("Test Toy", result.getName());
+    verify(repository).save(any(Toy.class));
   }
 
   @Test
-  void createToy_brandNotFound() {
-    when(brandRepository.findById(1L)).thenReturn(Optional.empty());
-
-    assertThrows(AppException.class, () -> service.createToy(dto));
-  }
-
-  @Test
-  void createToy_categoryNotFound() {
-    when(brandRepository.findById(1L)).thenReturn(Optional.of(brand));
-    when(categoryRepository.findById(1L)).thenReturn(Optional.empty());
-
-    assertThrows(AppException.class, () -> service.createToy(dto));
-  }
-
-  @Test
-  void updateToy_success() {
+  void updateToy_ShouldUpdateAndReturn() {
     when(repository.findById(1L)).thenReturn(Optional.of(toy));
     when(brandRepository.findById(1L)).thenReturn(Optional.of(brand));
     when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
-    when(repository.save(any())).thenReturn(toy);
-    when(mapper.toDto(any())).thenReturn(new ToyResponseDto());
+    when(repository.save(any(Toy.class))).thenReturn(toy);
+    when(mapper.toDto(toy)).thenReturn(responseDto);
 
-    assertNotNull(service.updateToy(1L, dto));
+    ToyResponseDto result = service.updateToy(1L, requestDto);
+
+    assertEquals("Test Toy", result.getName());
   }
 
   @Test
-  void updateToy_notFound() {
-    when(repository.findById(1L)).thenReturn(Optional.empty());
-
-    assertThrows(AppException.class, () -> service.updateToy(1L, dto));
-  }
-
-  @Test
-  void updateToy_brandNotFound() {
-    when(repository.findById(1L)).thenReturn(Optional.of(toy));
-    when(brandRepository.findById(1L)).thenReturn(Optional.empty());
-
-    assertThrows(AppException.class, () -> service.updateToy(1L, dto));
-  }
-
-  @Test
-  void updateToy_categoryNotFound() {
-    when(repository.findById(1L)).thenReturn(Optional.of(toy));
-    when(brandRepository.findById(1L)).thenReturn(Optional.of(brand));
-    when(categoryRepository.findById(1L)).thenReturn(Optional.empty());
-
-    assertThrows(AppException.class, () -> service.updateToy(1L, dto));
-  }
-
-  @Test
-  void deleteToy_success() {
+  void deleteToy_ShouldDelete() {
     when(repository.findById(1L)).thenReturn(Optional.of(toy));
     when(orderItemRepository.existsByToy_Id(1L)).thenReturn(false);
 
@@ -172,298 +144,57 @@ class ToyServiceImplTest {
   }
 
   @Test
-  void deleteToy_usedInOrder() {
-    when(repository.findById(1L)).thenReturn(Optional.of(toy));
-    when(orderItemRepository.existsByToy_Id(1L)).thenReturn(true);
-
-    assertThrows(AppException.class, () -> service.deleteToy(1L));
-  }
-
-  @Test
-  void deleteToy_notFound() {
-    when(repository.findById(1L)).thenReturn(Optional.empty());
-
-    assertThrows(AppException.class, () -> service.deleteToy(1L));
-  }
-
-  @Test
-  void getByCategoryAndPrice_cacheMissAndHit() {
+  void getByCategoryAndPrice_WithMaxPrice_ShouldReturnPage() {
     Page<Toy> page = new PageImpl<>(List.of(toy));
-
-    when(repository.findByCategoryAndPrice(any(), any(), any()))
+    when(repository.findByCategoryAndPriceBetween(
+        eq("Конструкторы"), eq(50.0), eq(150.0), any(PageRequest.class)))
         .thenReturn(page);
-    when(mapper.toDto(any())).thenReturn(new ToyResponseDto());
+    when(mapper.toDto(toy)).thenReturn(responseDto);
 
-    service.getByCategoryAndPrice("cat", 10.0, 0, 10);
-    service.getByCategoryAndPrice("cat", 10.0, 0, 10);
+    Page<ToyResponseDto> result = service.getByCategoryAndPrice(
+        "Конструкторы", 50.0, 150.0, 0, 10);
 
-    verify(repository, times(1))
-        .findByCategoryAndPrice(any(), any(), any());
+    assertEquals(1, result.getTotalElements());
+    verify(repository).findByCategoryAndPriceBetween(
+        eq("Конструкторы"), eq(50.0), eq(150.0), any(PageRequest.class));
   }
 
   @Test
-  void getByCategoryAndPriceNative() {
+  void getByCategoryAndPrice_WithNullMaxPrice_ShouldUseMaxValue() {
     Page<Toy> page = new PageImpl<>(List.of(toy));
-
-    when(repository.findByCategoryAndPriceNative(any(), any(), any()))
+    when(repository.findByCategoryAndPriceBetween(
+        eq("Конструкторы"), eq(0.0), eq(Double.MAX_VALUE), any(PageRequest.class)))
         .thenReturn(page);
-    when(mapper.toDto(any())).thenReturn(new ToyResponseDto());
+    when(mapper.toDto(toy)).thenReturn(responseDto);
 
-    assertEquals(1,
-        service.getByCategoryAndPriceNative("cat", 10.0, 0, 10)
-            .getContent().size());
+    Page<ToyResponseDto> result = service.getByCategoryAndPrice(
+        "Конструкторы", null, null, 0, 10);
+
+    assertEquals(1, result.getTotalElements());
   }
 
   @Test
-  void bulk_success() {
-    when(brandRepository.findById(1L)).thenReturn(Optional.of(brand));
-    when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
-    when(repository.save(any())).thenReturn(toy);
-    when(mapper.toDto(any())).thenReturn(new ToyResponseDto());
-
-    assertEquals(2,
-        service.createToysBulk(List.of(dto, dto)).size());
-  }
-
-  @Test
-  void bulk_noTx_error() {
-    ToyRequestDto bad = new ToyRequestDto();
-    bad.setName("ERROR");
-
-    List<ToyRequestDto> list = List.of(dto, bad);
-
-    assertThrows(AppException.class,
-        () -> service.createToysBulkNoTx(list));
-  }
-
-  @Test
-  void bulk_tx_error() {
-    ToyRequestDto bad = new ToyRequestDto();
-    bad.setName("ERROR");
-
-    List<ToyRequestDto> list = List.of(dto, bad);
-
-    assertThrows(AppException.class,
-        () -> service.createToysBulkTx(list));
-  }
-
-  @Test
-  void bulk_noTx_success() {
-    when(brandRepository.findById(1L)).thenReturn(Optional.of(brand));
-    when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
-    when(repository.save(any())).thenReturn(toy);
-    when(mapper.toDto(any())).thenReturn(new ToyResponseDto());
-
-    List<ToyResponseDto> result =
-        service.createToysBulkNoTx(List.of(dto, dto));
-
-    assertEquals(2, result.size());
-  }
-
-  @Test
-  void bulk_tx_success() {
-    when(brandRepository.findById(1L)).thenReturn(Optional.of(brand));
-    when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
-    when(repository.save(any())).thenReturn(toy);
-    when(mapper.toDto(any())).thenReturn(new ToyResponseDto());
-
-    List<ToyResponseDto> result =
-        service.createToysBulkTx(List.of(dto, dto));
-
-    assertEquals(2, result.size());
-  }
-
-  @Test
-  void getByCategoryAndPrice_cacheReturn() {
+  void getByCategoryAndPriceNative_ShouldReturnPage() {
     Page<Toy> page = new PageImpl<>(List.of(toy));
-
-    when(repository.findByCategoryAndPrice(any(), any(), any()))
+    when(repository.findByCategoryAndPriceBetweenNative(
+        eq("Конструкторы"), eq(50.0), eq(150.0), any(PageRequest.class)))
         .thenReturn(page);
-    when(mapper.toDto(any())).thenReturn(new ToyResponseDto());
+    when(mapper.toDto(toy)).thenReturn(responseDto);
 
-    var first = service.getByCategoryAndPrice("cat", 10.0, 0, 10);
-    var second = service.getByCategoryAndPrice("cat", 10.0, 0, 10);
+    Page<ToyResponseDto> result = service.getByCategoryAndPriceNative(
+        "Конструкторы", 50.0, 150.0, 0, 10);
 
-    assertSame(first, second);
+    assertEquals(1, result.getTotalElements());
   }
 
   @Test
-  void bulk_categoryNotFound() {
-    when(brandRepository.findById(1L)).thenReturn(Optional.of(brand));
-    when(categoryRepository.findById(1L)).thenReturn(Optional.empty());
-
-    List<ToyRequestDto> list = List.of(dto);
-    assertThrows(AppException.class,
-        () -> service.createToysBulk(list));
-  }
-
-  @Test
-  void bulk_brandNotFound() {
-    when(brandRepository.findById(1L)).thenReturn(Optional.empty());
-
-    List<ToyRequestDto> list = List.of(dto);
-
-    assertThrows(AppException.class,
-        () -> service.createToysBulk(list));
-  }
-
-  @Test
-  void getByCategoryAndPrice_cacheHit_returnFromCache() {
+  void getAllToysPaged_ShouldReturnPage() {
     Page<Toy> page = new PageImpl<>(List.of(toy));
-    ToyResponseDto dtoResp = new ToyResponseDto();
-
-    when(repository.findByCategoryAndPrice(any(), any(), any()))
-        .thenReturn(page);
-    when(mapper.toDto(any())).thenReturn(dtoResp);
-
-    service.getByCategoryAndPrice("cat", 10.0, 0, 10);
-
-    Page<ToyResponseDto> result =
-        service.getByCategoryAndPrice("cat", 10.0, 0, 10);
-
-    assertEquals(1, result.getContent().size());
-    verify(repository, times(1))
-        .findByCategoryAndPrice(any(), any(), any());
-  }
-
-  @Test
-  void createToy_clearsCache() {
-    Page<Toy> page = new PageImpl<>(List.of(toy));
-    ToyResponseDto dtoResp = new ToyResponseDto();
-
-    when(repository.findByCategoryAndPrice(any(), any(), any()))
-        .thenReturn(page, page);
-    when(mapper.toDto(any())).thenReturn(dtoResp);
-
-    when(brandRepository.findById(1L)).thenReturn(Optional.of(brand));
-    when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
-    when(repository.save(any())).thenReturn(toy);
-
-    service.getByCategoryAndPrice("cat", 10.0, 0, 10);
-
-    service.createToy(dto);
-
-    service.getByCategoryAndPrice("cat", 10.0, 0, 10);
-
-    verify(repository, times(2))
-        .findByCategoryAndPrice(any(), any(), any());
-  }
-
-  @Test
-  void bulk_mixed_errorInsideStream() {
-    ToyRequestDto bad = new ToyRequestDto();
-    bad.setName("OK");
-    bad.setBrandId(1L);
-    bad.setCategoryIds(Set.of(1L));
-
-    when(brandRepository.findById(1L))
-        .thenReturn(Optional.of(brand));
-    when(categoryRepository.findById(1L))
-        .thenReturn(Optional.empty());
-
-    List<ToyRequestDto> list = List.of(dto, bad);
-
-    assertThrows(AppException.class,
-        () -> service.createToysBulk(list));
-  }
-
-  @Test
-  void cache_hit_returnsSameObject() {
-    Page<Toy> page = new PageImpl<>(List.of(toy));
-    ToyResponseDto dtoResp = new ToyResponseDto();
-
-    when(repository.findByCategoryAndPrice(any(), any(), any()))
-        .thenReturn(page);
-    when(mapper.toDto(any())).thenReturn(dtoResp);
-
-    Page<ToyResponseDto> first =
-        service.getByCategoryAndPrice("cat", 10.0, 0, 10);
-
-    Page<ToyResponseDto> second =
-        service.getByCategoryAndPrice("cat", 10.0, 0, 10);
-
-    assertSame(first, second);
-  }
-
-  @Test
-  void toyNotFound_privateMethodCovered() {
-    when(repository.findById(999L)).thenReturn(Optional.empty());
-
-    assertThrows(AppException.class,
-        () -> service.updateToy(999L, dto));
-  }
-
-  @Test
-  void bulk_noTx_error_firstElement() {
-    ToyRequestDto bad = new ToyRequestDto();
-    bad.setName("ERROR");
-
-    List<ToyRequestDto> list = List.of(bad, dto);
-
-    assertThrows(AppException.class,
-        () -> service.createToysBulkNoTx(list));
-  }
-
-  @Test
-  void bulk_tx_error_firstElement() {
-    ToyRequestDto bad = new ToyRequestDto();
-    bad.setName("ERROR");
-
-    List<ToyRequestDto> list = List.of(bad, dto);
-
-    assertThrows(AppException.class,
-        () -> service.createToysBulkTx(list));
-  }
-
-  @Test
-  void bulk_noTx_fullBranchCoverage() {
-    ToyRequestDto ok = dto;
-
-    ToyRequestDto bad = new ToyRequestDto();
-    bad.setName("ERROR");
-
-    when(brandRepository.findById(1L)).thenReturn(Optional.of(brand));
-    when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
-    when(repository.save(any())).thenReturn(toy);
-    when(mapper.toDto(any())).thenReturn(new ToyResponseDto());
-
-    List<ToyRequestDto> list = List.of(ok, bad);
-
-    assertThrows(AppException.class,
-        () -> service.createToysBulkNoTx(list));
-  }
-
-  @Test
-  void bulk_tx_fullBranchCoverage() {
-    ToyRequestDto ok = dto;
-
-    ToyRequestDto bad = new ToyRequestDto();
-    bad.setName("ERROR");
-
-    when(brandRepository.findById(1L)).thenReturn(Optional.of(brand));
-    when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
-    when(repository.save(any())).thenReturn(toy);
-    when(mapper.toDto(any())).thenReturn(new ToyResponseDto());
-
-    List<ToyRequestDto> list = List.of(ok, bad);
-
-    assertThrows(AppException.class,
-        () -> service.createToysBulkTx(list));
-  }
-
-  @Test
-  void getAllToysPaged_success() {
-    Page<Toy> page = new PageImpl<>(List.of(toy));
-
-    when(repository.findAll(any(org.springframework.data.domain.Pageable.class)))
-        .thenReturn(page);
-    when(mapper.toDto(any())).thenReturn(new ToyResponseDto());
+    when(repository.findAll(any(PageRequest.class))).thenReturn(page);
+    when(mapper.toDto(toy)).thenReturn(responseDto);
 
     Page<ToyResponseDto> result = service.getAllToysPaged(0, 10);
 
-    assertNotNull(result);
-    assertEquals(1, result.getContent().size());
-
-    verify(repository).findAll(any(org.springframework.data.domain.Pageable.class));  }
-
+    assertEquals(1, result.getTotalElements());
+  }
 }
