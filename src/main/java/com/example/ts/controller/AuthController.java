@@ -1,6 +1,5 @@
 package com.example.ts.controller;
 
-import com.example.ts.domain.Customer;
 import com.example.ts.repository.CustomerRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
