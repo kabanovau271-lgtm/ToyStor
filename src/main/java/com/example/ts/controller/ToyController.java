@@ -84,23 +84,25 @@ public class ToyController {
   @Operation(summary = "Фильтр по категории и цене (JPQL)")
   @GetMapping("/filter")
   public Page<ToyResponseDto> filter(
-      @RequestParam String category,
-      @RequestParam Double minPrice,
-      @RequestParam @Min(0) int page,
-      @RequestParam @Min(1) @Max(50) int size
+      @RequestParam(required = false) String category,
+      @RequestParam(required = false) Double minPrice,
+      @RequestParam(required = false) Double maxPrice,
+      @RequestParam(defaultValue = "0") @Min(0) int page,
+      @RequestParam(defaultValue = "10") @Min(1) @Max(50) int size
   ) {
-    return service.getByCategoryAndPrice(category, minPrice, page, size);
+    return service.getByCategoryAndPrice(category, minPrice, maxPrice, page, size);
   }
 
   @Operation(summary = "Фильтр по категории и цене (Native SQL)")
   @GetMapping("/filter-native")
   public Page<ToyResponseDto> filterNative(
-      @RequestParam String category,
-      @RequestParam Double minPrice,
-      @RequestParam @Min(0) int page,
-      @RequestParam @Min(1) @Max(50) int size
+      @RequestParam(required = false) String category,
+      @RequestParam(required = false) Double minPrice,
+      @RequestParam(required = false) Double maxPrice,
+      @RequestParam(defaultValue = "0") @Min(0) int page,
+      @RequestParam(defaultValue = "10") @Min(1) @Max(50) int size
   ) {
-    return service.getByCategoryAndPriceNative(category, minPrice, page, size);
+    return service.getByCategoryAndPriceNative(category, minPrice, maxPrice, page, size);
   }
 
   @Operation(summary = "Создать несколько игрушек")

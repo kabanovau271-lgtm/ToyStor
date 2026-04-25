@@ -11,8 +11,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
       "items",
       "items.toy",
       "items.toy.brand",
-      "items.toy.categories"
+      "customer"
   })
   List<Order> findAllBy();
-
 }

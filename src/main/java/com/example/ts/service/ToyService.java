@@ -19,20 +19,8 @@ public interface ToyService {
 
   void deleteToy(Long id);
 
-  public Page<ToyResponseDto> getByCategoryAndPrice(
-      String category,
-      Double minPrice,
-      int page,
-      int size
-  );
-
-  Page<ToyResponseDto> getByCategoryAndPriceNative(
-      String category,
-      Double minPrice,
-      int page,
-      int size
-  );
-
+  Page<ToyResponseDto> getByCategoryAndPrice(String category, Double minPrice, Double maxPrice, int page, int size);
+  Page<ToyResponseDto> getByCategoryAndPriceNative(String category, Double minPrice, Double maxPrice, int page, int size);
   List<ToyResponseDto> createToysBulk(List<ToyRequestDto> dto);
   public List<ToyResponseDto> createToysBulkNoTx(List<ToyRequestDto> dto);
   public List<ToyResponseDto> createToysBulkTx(List<ToyRequestDto> dto);

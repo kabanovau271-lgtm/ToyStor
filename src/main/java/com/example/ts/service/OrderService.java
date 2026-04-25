@@ -38,7 +38,6 @@ public class OrderService {
   public List<Order> getAllOrders() {
     return orderRepository.findAllBy();
   }
-
   public Order getOrderById(Long id) {
     return orderRepository.findById(id)
         .orElseThrow(() ->

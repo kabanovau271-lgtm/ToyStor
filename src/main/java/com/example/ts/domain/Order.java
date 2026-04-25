@@ -2,7 +2,6 @@ package com.example.ts.domain;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.CascadeType;
@@ -33,9 +32,9 @@ public class Order {
 
   private LocalDateTime createdAt;
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "customer_id", nullable = false)
-  @JsonBackReference
+  @JsonIgnoreProperties({"orders", "hibernateLazyInitializer", "handler"})
   private Customer customer;
 
   @OneToMany(

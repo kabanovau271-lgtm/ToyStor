@@ -22,32 +22,38 @@ public interface ToyRepository extends JpaRepository<Toy, Long> {
 
   @EntityGraph(attributePaths = {"categories", "brand"})
   @Query("""
-SELECT t FROM Toy t
-JOIN t.categories c
-WHERE c.name = :categoryName
-AND t.price >= :minPrice
+  SELECT t FROM Toy t
+  JOIN t.categories c
+  WHERE (:category IS NULL OR c.name = :category)
+  AND t.price >= :minPrice
+  AND t.price <= :maxPrice
 """)
-  Page<Toy> findByCategoryAndPrice(
-      @Param("categoryName") String categoryName,
+  Page<Toy> findByCategoryAndPriceBetween(
+      @Param("category") String category,
       @Param("minPrice") Double minPrice,
+      @Param("maxPrice") Double maxPrice,
       Pageable pageable
   );
+
   @Query(
       value = "SELECT DISTINCT t.* FROM toys t " +
           "JOIN toy_category tc ON t.id = tc.toy_id " +
           "JOIN categories c ON tc.category_id = c.id " +
-          "WHERE c.name = :categoryName " +
-          "AND t.price >= :minPrice",
+          "WHERE (:category IS NULL OR c.name = :category) " +
+          "AND t.price >= :minPrice " +
+          "AND t.price <= :maxPrice",
       countQuery = "SELECT COUNT(DISTINCT t.id) FROM toys t " +
           "JOIN toy_category tc ON t.id = tc.toy_id " +
           "JOIN categories c ON tc.category_id = c.id " +
-          "WHERE c.name = :categoryName " +
-          "AND t.price >= :minPrice",
+          "WHERE (:category IS NULL OR c.name = :category) " +
+          "AND t.price >= :minPrice " +
+          "AND t.price <= :maxPrice",
       nativeQuery = true
   )
-  Page<Toy> findByCategoryAndPriceNative(
-      @Param("categoryName") String categoryName,
+  Page<Toy> findByCategoryAndPriceBetweenNative(
+      @Param("category") String category,
       @Param("minPrice") Double minPrice,
+      @Param("maxPrice") Double maxPrice,
       Pageable pageable
   );
 }

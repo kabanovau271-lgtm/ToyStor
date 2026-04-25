@@ -1,8 +1,8 @@
 package com.example.ts.domain;
 
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -31,7 +31,11 @@ public class Customer {
 
   private String email;
 
+  private String password;
+
+  private String role;
+
   @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-  @JsonManagedReference
+  @JsonIgnore
   private List<Order> orders;
 }

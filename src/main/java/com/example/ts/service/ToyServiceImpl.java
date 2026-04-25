@@ -128,44 +128,26 @@ public class ToyServiceImpl implements ToyService {
 
   @Override
   public Page<ToyResponseDto> getByCategoryAndPrice(
-      String category,
-      Double minPrice,
-      int page,
-      int size
-  ) {
+      String category, Double minPrice, Double maxPrice, int page, int size) {
 
-    ToySearchKey key = new ToySearchKey(category, minPrice, page, size);
+    minPrice = minPrice != null ? minPrice : 0.0;
+    maxPrice = maxPrice != null ? maxPrice : Double.MAX_VALUE;
 
-    if (cache.containsKey(key)) {
-      log.info("FROM CACHE");
-      return cache.get(key);
-    }
+    Page<Toy> toys = repository.findByCategoryAndPriceBetween(
+        category, minPrice, maxPrice, PageRequest.of(page, size));
 
-    Page<Toy> toys = repository.findByCategoryAndPrice(
-        category,
-        minPrice,
-        PageRequest.of(page, size)
-    );
-
-    Page<ToyResponseDto> result = toys.map(mapper::toDto);
-    cache.put(key, result);
-
-    return result;
+    return toys.map(mapper::toDto);
   }
 
   @Override
   public Page<ToyResponseDto> getByCategoryAndPriceNative(
-      String category,
-      Double minPrice,
-      int page,
-      int size
-  ) {
+      String category, Double minPrice, Double maxPrice, int page, int size) {
 
-    Page<Toy> toys = repository.findByCategoryAndPriceNative(
-        category,
-        minPrice,
-        PageRequest.of(page, size)
-    );
+    minPrice = minPrice != null ? minPrice : 0.0;
+    maxPrice = maxPrice != null ? maxPrice : Double.MAX_VALUE;
+
+    Page<Toy> toys = repository.findByCategoryAndPriceBetweenNative(
+        category, minPrice, maxPrice, PageRequest.of(page, size));
 
     return toys.map(mapper::toDto);
   }
