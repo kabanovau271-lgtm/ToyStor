@@ -39,11 +39,23 @@ export const getCategories = () =>
 export const getBrands = () =>
   API.get('/brands')
 
- export const createOrder = (data) =>
-    API.post('/orders', data)
+export const createBrand = (data) =>
+  API.post('/brands', data)
 
- export const getOrders = () =>
-      API.get('/orders')
+export const createCategory = (data) =>
+  API.post('/categories', data)
 
- export const deleteOrder = (id) =>
-   API.delete(`/orders/${id}`)
+export const createOrder = (data) =>
+  API.post('/orders', data)
+
+export const getOrders = () =>
+  API.get('/orders')
+
+export const deleteOrder = (id) =>
+  API.delete(`/orders/${id}`)
+
+  export const deleteBrand = (id) =>
+    API.delete(`/brands/${id}`)
+
+  export const deleteCategory = (id) =>
+    API.delete(`/categories/${id}`)

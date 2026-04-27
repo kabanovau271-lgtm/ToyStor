@@ -16,7 +16,14 @@
   max-height: 90vh;
   overflow-y: auto;
   box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+  scrollbar-width: thin;
+  scrollbar-color: #E8D5C7 #FDF8F0;
 }
+
+.modal::-webkit-scrollbar { width: 6px; }
+.modal::-webkit-scrollbar-track { background: #FDF8F0; border-radius: 3px; }
+.modal::-webkit-scrollbar-thumb { background: #E8D5C7; border-radius: 3px; }
+.modal::-webkit-scrollbar-thumb:hover { background: #D4BFA8; }
 
 .modal h2 {
   font-size: 22px;
@@ -48,41 +55,107 @@
   cursor: pointer;
 }
 
-.modal input::placeholder,
-.modal select::placeholder {
-  color: #C4B8A8;
+.modal input::placeholder { color: #C4B8A8; }
+
+.form-field { margin-bottom: 14px; }
+
+.btn-add-small {
+  padding: 6px 12px;
+  background: #F5EDE3;
+  color: #8B7355;
+  border: none;
+  border-radius: 12px;
+  font-size: 12px;
+  cursor: pointer;
+  margin-top: 6px;
+}
+.btn-add-small:hover { background: #E8D5C7; }
+
+.add-inline {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
+}
+.add-inline input {
+  flex: 1;
+  padding: 8px 12px;
+  margin-bottom: 0;
+}
+
+.btn-save-small, .btn-cancel-small {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 12px;
+  font-size: 13px;
+  cursor: pointer;
+}
+.btn-save-small { background: #C9A87C; color: white; }
+.btn-cancel-small { background: #F5EDE3; color: #8B7355; }
+
+.form-image-upload {
+  margin-bottom: 14px;
+  text-align: center;
+}
+
+.file-label {
+  display: inline-block;
+  padding: 10px 20px;
+  background: #F5EDE3;
+  color: #8B7355;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.2s;
+}
+.file-label:hover { background: #E8D5C7; }
+
+.image-preview {
+  display: block;
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin: 12px auto 0;
+  border: 2px solid #E8D5C7;
 }
 
 .form-categories { margin-bottom: 14px; }
-.form-categories p {
+
+.form-cat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.form-cat-header p {
   font-size: 14px;
   color: #8B7355;
-  margin-bottom: 10px;
   font-weight: bold;
+  margin-bottom: 0;
 }
 
 .form-cat-list {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 6px;
+  gap: 4px;
 }
 
 .form-cat-check {
   display: flex;
   align-items: center;
-  font-size: 14px;
+  font-size: 13px;
   color: #5D4037;
   cursor: pointer;
-  padding: 5px 0;
+  padding: 3px 0;
 }
 
 .form-cat-check input[type="checkbox"] {
   appearance: none;
   -webkit-appearance: none;
-  margin-right: 10px;
-  width: 18px;
-  height: 18px;
-  border: 2px solid #E0D5C7;
+  margin-right: 6px;
+  width: 12px;
+  height: 12px;
+  border: 1.5px solid #E0D5C7;
   border-radius: 50%;
   background: white;
   cursor: pointer;
@@ -100,7 +173,7 @@
 .form-cat-check input[type="checkbox"]:checked::after {
   content: '✓';
   color: white;
-  font-size: 12px;
+  font-size: 8px;
   font-weight: bold;
   position: absolute;
   top: 50%;
@@ -130,57 +203,38 @@
   color: #8B7355 !important;
 }
 .btn-cancel:hover { background: #E8D5C7 !important; }
-.form-image-upload {
-  margin-bottom: 14px;
-  text-align: center;
+
+.select-row {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
 }
 
-.file-label {
-  display: inline-block;
-  padding: 10px 20px;
-  background: #F5EDE3;
-  color: #8B7355;
-  border-radius: 20px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: background 0.2s;
-}
-.file-label:hover {
-  background: #E8D5C7;
+.select-row select {
+  flex: 1;
+  margin-bottom: 0;
 }
 
-.image-preview {
-  display: block;
-  width: 120px;
-  height: 120px;
-  object-fit: cover;
-  border-radius: 12px;
-  margin: 12px auto 0;
+.btn-delete-row {
+  padding: 0 12px;
   border: 2px solid #E8D5C7;
-}
-.modal {
-  background: #FFFDF9;
-  padding: 32px;
-  border-radius: 24px;
-  width: 500px;
-  max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.08);
-  scrollbar-width: thin;
-  scrollbar-color: #E8D5C7 #FDF8F0;
+  border-radius: 14px;
+  background: #FDF8F0;
+  cursor: pointer;
+  font-size: 16px;
 }
 
-.modal::-webkit-scrollbar {
-  width: 6px;
+.cat-row {
+  display: flex;
+  align-items: center;
+  gap: 2px;
 }
-.modal::-webkit-scrollbar-track {
-  background: #FDF8F0;
-  border-radius: 3px;
-}
-.modal::-webkit-scrollbar-thumb {
-  background: #E8D5C7;
-  border-radius: 3px;
-}
-.modal::-webkit-scrollbar-thumb:hover {
-  background: #D4BFA8;
+
+.btn-cat-delete {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 11px;
+  color: #ccc;
+  padding: 2px;
 }

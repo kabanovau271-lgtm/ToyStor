@@ -184,44 +184,34 @@ function App() {
 
   return (
     <div className="app">
-      <div className="user-bar">
-        <span className="user-role">{isAdmin ? '👑 Администратор' : '👤 Покупатель'}</span>
-        <button className="logout-btn" onClick={() => setUser(null)}>Выйти</button>
-      </div>
 
-      <header className="header">
-        <h1>🐣 Капитошка</h1>
-        <div className="search-bar">
-          <input
-            type="text"
-            placeholder="Поиск игрушек..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-          />
-          <button onClick={handleSearch}>🔍</button>
-          <button className="filter-btn" onClick={() => setShowFilter(!showFilter)}>☰</button>
-        </div>
-      </header>
 
-      {!isAdmin && (
-        <div style={{ marginBottom: '14px', textAlign: 'right' }}>
-          <button
-            onClick={() => setShowMyOrders(true)}
-            style={{
-              padding: '8px 16px',
-              background: 'transparent',
-              border: '1px solid #C9A87C',
-              borderRadius: '20px',
-              color: '#C9A87C',
-              cursor: 'pointer',
-              fontSize: '14px',
-            }}
-          >
-            📦 Мои заказы
-          </button>
-        </div>
-      )}
+     <header className="header">
+       <h1>🐣 Капитошка</h1>
+       <div className="search-bar">
+         <input
+           type="text"
+           placeholder="Поиск игрушек..."
+           value={search}
+           onChange={(e) => setSearch(e.target.value)}
+           onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+         />
+         <button onClick={handleSearch}>🔍</button>
+         <button className="filter-btn" onClick={() => setShowFilter(!showFilter)}>☰</button>
+       </div>
+       <div className="header-actions">
+         {!isAdmin && (
+           <button className="header-btn my-orders-btn" onClick={() => setShowMyOrders(true)}>
+             📦 Мои заказы
+           </button>
+         )}
+         <button className="header-btn logout-btn-header" onClick={() => setUser(null)}>
+           Выйти
+         </button>
+       </div>
+     </header>
+
+
 
       {showFilter && (
         <div className="filter-panel">

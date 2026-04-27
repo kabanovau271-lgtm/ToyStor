@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { getBrands, getCategories } from '../api/toyApi'
+import { getBrands, getCategories, createBrand, createCategory, deleteBrand, deleteCategory } from '../api/toyApi'
 import './ToyForm.css'
 
 function ToyForm({ toy, onSave, onCancel }) {
@@ -13,10 +13,12 @@ function ToyForm({ toy, onSave, onCancel }) {
 
   const [brands, setBrands] = useState([])
   const [categories, setCategories] = useState([])
+  const [newBrand, setNewBrand] = useState('')
+  const [newCategory, setNewCategory] = useState('')
+  const [showAddBrand, setShowAddBrand] = useState(false)
+  const [showAddCat, setShowAddCat] = useState(false)
 
-  useEffect(() => {
-    loadData()
-  }, [])
+  useEffect(() => { loadData() }, [])
 
   const loadData = async () => {
     try {
@@ -49,36 +51,61 @@ function ToyForm({ toy, onSave, onCancel }) {
     )
   }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-
-    let imagePath = ''
-    if (imageFile) {
-      // Копируем файл в public/images через fetch
-      const formData = new FormData()
-      formData.append('image', imageFile)
-
-      try {
-        // Сохраняем файл в public/images через API (fetch напрямую нельзя — используем трюк)
-        const safeName = Date.now() + '_' + imageFile.name.replace(/\s/g, '_')
-        const response = await fetch(`/images/${safeName}`, {
-          method: 'PUT',
-          body: imageFile,
-        }).catch(() => null)
-
-        // Если PUT не сработал — делаем по-другому: через создание ссылки
-        // Просто используем временный URL для предпросмотра
-        imagePath = imagePreview
-      } catch (err) {
-        console.log('Файл будет сохранён как:', imageFile.name)
-        imagePath = '/images/' + imageFile.name
-      }
+  const handleAddBrand = async () => {
+    if (!newBrand.trim()) return
+    try {
+      const res = await createBrand({ name: newBrand })
+      setBrands(prev => [...prev, res.data])
+      setBrandId(res.data.id)
+      setNewBrand('')
+      setShowAddBrand(false)
+    } catch (err) {
+      alert('Ошибка добавления бренда')
     }
+  }
 
+  const handleAddCategory = async () => {
+    if (!newCategory.trim()) return
+    try {
+      const res = await createCategory({ name: newCategory })
+      setCategories(prev => [...prev, res.data])
+      setNewCategory('')
+      setShowAddCat(false)
+    } catch (err) {
+      alert('Ошибка добавления категории')
+    }
+  }
+
+  const handleDeleteBrand = async (id) => {
+    if (!window.confirm('Удалить бренд?')) return
+    try {
+      await deleteBrand(id)
+      setBrands(prev => prev.filter(b => b.id != id))
+      if (brandId == id) setBrandId('')
+    } catch (err) {
+      alert('Ошибка удаления бренда')
+    }
+  }
+
+  const handleDeleteCategory = async (id) => {
+    if (!window.confirm('Удалить категорию?')) return
+    try {
+      await deleteCategory(id)
+      setCategories(prev => prev.filter(c => c.id != id))
+      setSelectedCategories(prev => {
+        const deleted = categories.find(c => c.id == id)
+        return deleted ? prev.filter(c => c !== deleted.name) : prev
+      })
+    } catch (err) {
+      alert('Ошибка удаления категории')
+    }
+  }
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
     const catIds = categories
       .filter(c => selectedCategories.includes(c.name))
       .map(c => c.id)
-
     onSave({
       name,
       price: Number(price),
@@ -94,60 +121,60 @@ function ToyForm({ toy, onSave, onCancel }) {
       <div className="modal">
         <h2>{toy ? '✏️ Редактировать' : '➕ Новая игрушка'}</h2>
         <form onSubmit={handleSubmit}>
-          <input
-            placeholder="Название"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
-          <input
-            type="number"
-            placeholder="Цена (Br)"
-            value={price}
-            onChange={(e) => setPrice(e.target.value)}
-            required
-          />
-          <input
-            type="number"
-            placeholder="Количество"
-            value={quantity}
-            onChange={(e) => setQuantity(e.target.value)}
-            required
-          />
-          <select value={brandId} onChange={(e) => setBrandId(e.target.value)} required>
-            <option value="">Выбери бренд</option>
-            {brands.map(b => (
-              <option key={b.id} value={b.id}>{b.name}</option>
-            ))}
-          </select>
+          <input placeholder="Название" value={name} onChange={(e) => setName(e.target.value)} required />
+          <input type="number" placeholder="Цена (Br)" value={price} onChange={(e) => setPrice(e.target.value)} required />
+          <input type="number" placeholder="Количество" value={quantity} onChange={(e) => setQuantity(e.target.value)} required />
 
-          <div className="form-image-upload">
-            <label className="file-label">
-              📷 Выбрать картинку
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleFileChange}
-                hidden
-              />
-            </label>
-            {imagePreview && (
-              <img src={imagePreview} alt="preview" className="image-preview" />
+          <div className="form-field">
+            <div className="select-row">
+              <select value={brandId} onChange={(e) => setBrandId(e.target.value)} required>
+                <option value="">Выбери бренд</option>
+                {brands.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+              </select>
+              {brandId && (
+                <button type="button" className="btn-delete-row" onClick={() => handleDeleteBrand(brandId)}>🗑️</button>
+              )}
+            </div>
+            {!showAddBrand ? (
+              <button type="button" className="btn-add-small" onClick={() => setShowAddBrand(true)}>+ Бренд</button>
+            ) : (
+              <div className="add-inline">
+                <input placeholder="Новый бренд" value={newBrand} onChange={(e) => setNewBrand(e.target.value)} />
+                <button type="button" className="btn-save-small" onClick={handleAddBrand}>✓</button>
+                <button type="button" className="btn-cancel-small" onClick={() => setShowAddBrand(false)}>✕</button>
+              </div>
             )}
           </div>
 
+          <div className="form-image-upload">
+            <label className="file-label">📷 Выбрать картинку
+              <input type="file" accept="image/*" onChange={handleFileChange} hidden />
+            </label>
+            {imagePreview && <img src={imagePreview} alt="preview" className="image-preview" />}
+          </div>
+
           <div className="form-categories">
-            <p>Категории:</p>
+            <div className="form-cat-header">
+              <p>Категории:</p>
+              {!showAddCat ? (
+                <button type="button" className="btn-add-small" onClick={() => setShowAddCat(true)}>+ Категория</button>
+              ) : (
+                <div className="add-inline">
+                  <input placeholder="Новая категория" value={newCategory} onChange={(e) => setNewCategory(e.target.value)} />
+                  <button type="button" className="btn-save-small" onClick={handleAddCategory}>✓</button>
+                  <button type="button" className="btn-cancel-small" onClick={() => setShowAddCat(false)}>✕</button>
+                </div>
+              )}
+            </div>
             <div className="form-cat-list">
               {categories.map(c => (
-                <label key={c.id} className="form-cat-check">
-                  <input
-                    type="checkbox"
-                    checked={selectedCategories.includes(c.name)}
-                    onChange={() => toggleCategory(c.name)}
-                  />
-                  {c.name}
-                </label>
+                <div key={c.id} className="cat-row">
+                  <label className="form-cat-check">
+                    <input type="checkbox" checked={selectedCategories.includes(c.name)} onChange={() => toggleCategory(c.name)} />
+                    {c.name}
+                  </label>
+                  <button type="button" className="btn-cat-delete" onClick={() => handleDeleteCategory(c.id)}>🗑️</button>
+                </div>
               ))}
             </div>
           </div>
