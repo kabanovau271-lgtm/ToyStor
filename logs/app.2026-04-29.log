@@ -1,0 +1,50 @@
+2026-04-29 08:47:21 DEBUG com.example.ts.aop.LoggingAspect - Метод ToyController.getAll(..) вызван с параметрами: [0, 6]
+2026-04-29 08:47:21 DEBUG com.example.ts.aop.LoggingAspect - Метод CategoryController.getAllCategories() вызван с параметрами: []
+2026-04-29 08:47:21 DEBUG com.example.ts.aop.LoggingAspect - Метод CategoryServiceImpl.getAllCategories() вызван с параметрами: []
+2026-04-29 08:47:21 DEBUG com.example.ts.aop.LoggingAspect - Метод ToyServiceImpl.getAllToysPaged(..) вызван с параметрами: [0, 6]
+2026-04-29 08:47:21 INFO  com.example.ts.aop.LoggingAspect - Метод CategoryServiceImpl.getAllCategories() выполнен успешно за 38 ms
+2026-04-29 08:47:21 INFO  com.example.ts.aop.LoggingAspect - Метод CategoryController.getAllCategories() выполнен успешно за 40 ms
+2026-04-29 08:47:21 DEBUG com.example.ts.aop.LoggingAspect - Метод CategoryController.getAllCategories() вызван с параметрами: []
+2026-04-29 08:47:21 DEBUG com.example.ts.aop.LoggingAspect - Метод CategoryServiceImpl.getAllCategories() вызван с параметрами: []
+2026-04-29 08:47:21 INFO  com.example.ts.aop.LoggingAspect - Метод ToyServiceImpl.getAllToysPaged(..) выполнен успешно за 42 ms
+2026-04-29 08:47:21 INFO  com.example.ts.aop.LoggingAspect - Метод ToyController.getAll(..) выполнен успешно за 57 ms
+2026-04-29 08:47:21 INFO  com.example.ts.aop.LoggingAspect - Метод CategoryServiceImpl.getAllCategories() выполнен успешно за 2 ms
+2026-04-29 08:47:21 INFO  com.example.ts.aop.LoggingAspect - Метод CategoryController.getAllCategories() выполнен успешно за 2 ms
+2026-04-29 08:47:21 DEBUG com.example.ts.aop.LoggingAspect - Метод ToyController.getAll(..) вызван с параметрами: [0, 6]
+2026-04-29 08:47:21 DEBUG com.example.ts.aop.LoggingAspect - Метод ToyServiceImpl.getAllToysPaged(..) вызван с параметрами: [0, 6]
+2026-04-29 08:47:21 INFO  com.example.ts.aop.LoggingAspect - Метод ToyServiceImpl.getAllToysPaged(..) выполнен успешно за 14 ms
+2026-04-29 08:47:21 INFO  com.example.ts.aop.LoggingAspect - Метод ToyController.getAll(..) выполнен успешно за 14 ms
+2026-04-29 08:47:22 DEBUG com.example.ts.aop.LoggingAspect - Метод AuthController.login(..) вызван с параметрами: [com.example.ts.controller.LoginRequest@14f050a]
+2026-04-29 08:47:22 INFO  com.example.ts.aop.LoggingAspect - Метод AuthController.login(..) выполнен успешно за 5 ms
+2026-04-29 08:47:30 DEBUG com.example.ts.aop.LoggingAspect - Метод ToyController.getAll(..) вызван с параметрами: [1, 6]
+2026-04-29 08:47:30 DEBUG com.example.ts.aop.LoggingAspect - Метод ToyServiceImpl.getAllToysPaged(..) вызван с параметрами: [1, 6]
+2026-04-29 08:47:30 INFO  com.example.ts.aop.LoggingAspect - Метод ToyServiceImpl.getAllToysPaged(..) выполнен успешно за 10 ms
+2026-04-29 08:47:30 INFO  com.example.ts.aop.LoggingAspect - Метод ToyController.getAll(..) выполнен успешно за 11 ms
+2026-04-29 14:50:56 ERROR com.example.ts.exception.GlobalExceptionHandler - Internal server error: INTERNAL_SERVER_ERROR (500)
+2026-04-29 14:51:00 ERROR com.example.ts.exception.GlobalExceptionHandler - Internal server error: INTERNAL_SERVER_ERROR (500)
+2026-04-29 14:51:00 ERROR com.example.ts.exception.GlobalExceptionHandler - Internal server error: INTERNAL_SERVER_ERROR (500)
+2026-04-29 14:51:00 ERROR com.example.ts.exception.GlobalExceptionHandler - Internal server error: INTERNAL_SERVER_ERROR (500)
+2026-04-29 20:45:01 DEBUG com.example.ts.aop.LoggingAspect - Метод CategoryController.getAllCategories() вызван с параметрами: []
+2026-04-29 20:45:01 DEBUG com.example.ts.aop.LoggingAspect - Метод CategoryServiceImpl.getAllCategories() вызван с параметрами: []
+2026-04-29 20:45:01 DEBUG com.example.ts.aop.LoggingAspect - Метод ToyController.getAll(..) вызван с параметрами: [0, 6]
+2026-04-29 20:45:01 DEBUG com.example.ts.aop.LoggingAspect - Метод ToyServiceImpl.getAllToysPaged(..) вызван с параметрами: [0, 6]
+2026-04-29 20:45:01 INFO  com.example.ts.aop.LoggingAspect - Метод CategoryServiceImpl.getAllCategories() выполнен успешно за 66 ms
+2026-04-29 20:45:01 INFO  com.example.ts.aop.LoggingAspect - Метод CategoryController.getAllCategories() выполнен успешно за 67 ms
+2026-04-29 20:45:01 DEBUG com.example.ts.aop.LoggingAspect - Метод CategoryController.getAllCategories() вызван с параметрами: []
+2026-04-29 20:45:01 DEBUG com.example.ts.aop.LoggingAspect - Метод CategoryServiceImpl.getAllCategories() вызван с параметрами: []
+2026-04-29 20:45:01 INFO  com.example.ts.aop.LoggingAspect - Метод CategoryServiceImpl.getAllCategories() выполнен успешно за 3 ms
+2026-04-29 20:45:01 INFO  com.example.ts.aop.LoggingAspect - Метод CategoryController.getAllCategories() выполнен успешно за 3 ms
+2026-04-29 20:45:01 INFO  com.example.ts.aop.LoggingAspect - Метод ToyServiceImpl.getAllToysPaged(..) выполнен успешно за 62 ms
+2026-04-29 20:45:01 INFO  com.example.ts.aop.LoggingAspect - Метод ToyController.getAll(..) выполнен успешно за 95 ms
+2026-04-29 20:45:01 DEBUG com.example.ts.aop.LoggingAspect - Метод ToyController.getAll(..) вызван с параметрами: [0, 6]
+2026-04-29 20:45:01 DEBUG com.example.ts.aop.LoggingAspect - Метод ToyServiceImpl.getAllToysPaged(..) вызван с параметрами: [0, 6]
+2026-04-29 20:45:01 INFO  com.example.ts.aop.LoggingAspect - Метод ToyServiceImpl.getAllToysPaged(..) выполнен успешно за 22 ms
+2026-04-29 20:45:01 INFO  com.example.ts.aop.LoggingAspect - Метод ToyController.getAll(..) выполнен успешно за 23 ms
+2026-04-29 20:45:06 DEBUG com.example.ts.aop.LoggingAspect - Метод AuthController.login(..) вызван с параметрами: [com.example.ts.controller.LoginRequest@7159ff26]
+2026-04-29 20:45:06 INFO  com.example.ts.aop.LoggingAspect - Метод AuthController.login(..) выполнен успешно за 6 ms
+2026-04-29 20:45:15 DEBUG com.example.ts.aop.LoggingAspect - Метод AuthController.login(..) вызван с параметрами: [com.example.ts.controller.LoginRequest@211b7754]
+2026-04-29 20:45:15 INFO  com.example.ts.aop.LoggingAspect - Метод AuthController.login(..) выполнен успешно за 4 ms
+2026-04-29 20:45:25 DEBUG com.example.ts.aop.LoggingAspect - Метод OrderController.create(..) вызван с параметрами: [OrderRequestDto[customerId=6, items=[OrderItemRequestDto[toyId=2, quantity=3]]]]
+2026-04-29 20:45:25 DEBUG com.example.ts.aop.LoggingAspect - Метод OrderService.createOrder(..) вызван с параметрами: [OrderRequestDto[customerId=6, items=[OrderItemRequestDto[toyId=2, quantity=3]]]]
+2026-04-29 20:45:25 INFO  com.example.ts.aop.LoggingAspect - Метод OrderService.createOrder(..) выполнен успешно за 45 ms
+2026-04-29 20:45:25 INFO  com.example.ts.aop.LoggingAspect - Метод OrderController.create(..) выполнен успешно за 58 ms

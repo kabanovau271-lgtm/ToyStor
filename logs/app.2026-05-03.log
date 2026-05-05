@@ -1,0 +1,14 @@
+2026-05-03 12:54:14 INFO  com.example.ts.TsApplication - Starting TsApplication using Java 17.0.17 with PID 15292 (C:\Users\user\Desktop\Pnavu\TS\target\classes started by user in C:\Users\user\Desktop\Pnavu\TS)
+2026-05-03 12:54:14 DEBUG com.example.ts.TsApplication - Running with Spring Boot v3.2.12, Spring v6.1.15
+2026-05-03 12:54:14 INFO  com.example.ts.TsApplication - No active profile set, falling back to 1 default profile: "default"
+2026-05-03 12:54:20 INFO  com.example.ts.TsApplication - Started TsApplication in 6.995 seconds (process running for 7.355)
+2026-05-03 13:02:52 ERROR com.example.ts.exception.GlobalExceptionHandler - Internal server error: INTERNAL_SERVER_ERROR (500)
+2026-05-03 13:02:52 ERROR com.example.ts.exception.GlobalExceptionHandler - Internal server error: INTERNAL_SERVER_ERROR (500)
+2026-05-03 13:02:57 ERROR com.example.ts.exception.GlobalExceptionHandler - Internal server error: INTERNAL_SERVER_ERROR (500)
+2026-05-03 13:02:57 ERROR com.example.ts.exception.GlobalExceptionHandler - Internal server error: INTERNAL_SERVER_ERROR (500)
+2026-05-03 13:02:58 ERROR com.example.ts.exception.GlobalExceptionHandler - Internal server error: INTERNAL_SERVER_ERROR (500)
+2026-05-03 13:02:58 ERROR com.example.ts.exception.GlobalExceptionHandler - Internal server error: INTERNAL_SERVER_ERROR (500)
+2026-05-03 13:09:00 ERROR com.example.ts.exception.GlobalExceptionHandler - Internal server error: INTERNAL_SERVER_ERROR (500)
+2026-05-03 13:09:04 ERROR com.example.ts.exception.GlobalExceptionHandler - Internal server error: INTERNAL_SERVER_ERROR (500)
+2026-05-03 13:09:04 ERROR com.example.ts.exception.GlobalExceptionHandler - Internal server error: INTERNAL_SERVER_ERROR (500)
+2026-05-03 13:09:04 ERROR com.example.ts.exception.GlobalExceptionHandler - Internal server error: INTERNAL_SERVER_ERROR (500)

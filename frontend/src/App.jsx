@@ -16,18 +16,6 @@ const CATEGORY_COLORS = {
   'Настольные игры': '#FDFFB6',
 }
 
-const TOY_IMAGES = {
-  'Плюшевый медведь': '/images/bear.jpg',
-  'Зайка-плюшка': '/images/bunny.jpg',
-  'Lego City Полицейский участок': '/images/lego-police.jpg',
-  'Lego Дом': '/images/lego-house.jpg',
-  'Кукла Балерина': '/images/barbie.jpg',
-  'Машинка Hot Wheels': '/images/hotwheels.jpg',
-  'Монополия': '/images/monopoly.jpg',
-  'Развивающий кубик': '/images/cube.jpg',
-  'Гоночная машина': '/images/lego-technic.jpg',
-  'Пазл Животные': '/images/puzzle.jpg',
-}
 
 const PAGE_SIZE = 6
 
@@ -128,10 +116,9 @@ function App() {
 
   const addToCart = (toy) => { setCart([...cart, toy]) }
 
-  const getToyImage = (toy) => {
-    if (TOY_IMAGES[toy.name]) return TOY_IMAGES[toy.name]
-    return `/images/${toy.name}.jpg`
-  }
+const getToyImage = (toy) => {
+  return `/images/${toy.id}.jpg`
+}
 
   const getInitial = (name) => {
     const words = name.split(' ')
