@@ -1,0 +1,8 @@
+2026-05-05 21:11:18 INFO  com.example.ts.TsApplication - Starting TsApplication using Java 17.0.17 with PID 5896 (C:\Users\user\Desktop\Pnavu\TS\target\classes started by user in C:\Users\user\Desktop\Pnavu\TS)
+2026-05-05 21:11:18 DEBUG com.example.ts.TsApplication - Running with Spring Boot v3.2.12, Spring v6.1.15
+2026-05-05 21:11:18 INFO  com.example.ts.TsApplication - No active profile set, falling back to 1 default profile: "default"
+2026-05-05 21:11:42 INFO  com.example.ts.TsApplication - Started TsApplication in 25.289 seconds (process running for 31.932)
+2026-05-05 22:31:10 INFO  com.example.ts.TsApplication - Starting TsApplication using Java 17.0.17 with PID 22720 (C:\Users\user\Desktop\Pnavu\TS\target\classes started by user in C:\Users\user\Desktop\Pnavu\TS)
+2026-05-05 22:31:10 DEBUG com.example.ts.TsApplication - Running with Spring Boot v3.2.12, Spring v6.1.15
+2026-05-05 22:31:10 INFO  com.example.ts.TsApplication - No active profile set, falling back to 1 default profile: "default"
+2026-05-05 22:31:23 INFO  com.example.ts.TsApplication - Started TsApplication in 13.93 seconds (process running for 14.695)
