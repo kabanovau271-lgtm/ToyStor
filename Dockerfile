@@ -21,4 +21,4 @@ ENV SPRING_DATASOURCE_URL=jdbc:postgresql://dpg-d7t3qm0k1i2s73aakr10-a:5432/toys
 ENV SPRING_DATASOURCE_USERNAME=admin
 ENV SPRING_DATASOURCE_PASSWORD=N8ogDTpsyM8bRQKLTqX6b1cULOGICOKC
 ENV SPRING_JPA_HIBERNATE_DDL_AUTO=update
-ENTRYPOINT ["java", "-jar", "app.jar", "--server.port=${PORT:8080}"]
+ENTRYPOINT ["java", "-jar", "app.jar"]
