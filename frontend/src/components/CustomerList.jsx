@@ -12,7 +12,7 @@ function CustomerList({ onClose }) {
 
   const loadCustomers = async () => {
     try {
-      const res = await axios.get('http://localhost:8080/customers')
+      const res = await axios.get('https://toyshop-c7ib.onrender.com/customers')
       setCustomers(res.data)
     } catch (err) {
       console.error('Ошибка загрузки пользователей:', err)
@@ -24,7 +24,7 @@ function CustomerList({ onClose }) {
   const handleDelete = async (id) => {
     if (!window.confirm('Удалить пользователя?')) return
     try {
-      await axios.delete(`http://localhost:8080/customers/${id}`)
+      await axios.delete(`https://toyshop-c7ib.onrender.com/customers/${id}`)
       loadCustomers()
     } catch (err) {
       alert('Ошибка удаления')
