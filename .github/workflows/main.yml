@@ -7,7 +7,22 @@ on:
 
 jobs:
 
-  build-and-test:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'maven'
+      - name: Build project
+        run: mvn clean compile
+
+  test:
+    needs: build
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -23,7 +38,6 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -33,12 +47,6 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           cache: 'maven'
-      - name: Build project
-        run: mvn clean compile
-        env:
-          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/toyshop
-          SPRING_DATASOURCE_USERNAME: postgres
-          SPRING_DATASOURCE_PASSWORD: postgres
       - name: Run Tests
         run: mvn test
         env:
@@ -47,13 +55,11 @@ jobs:
           SPRING_DATASOURCE_PASSWORD: postgres
 
   deploy:
-
-    needs: build-and-test
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - name: Deploy to Render
-        run: |
-          curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}
+        run: curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}
 
   healthcheck:
     needs: deploy
