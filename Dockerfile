@@ -17,4 +17,8 @@ FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
 COPY --from=backend-build /app/target/*.jar app.jar
 EXPOSE 8080
+ENV SPRING_DATASOURCE_URL=jdbc:postgresql://dpg-d7t3qm0k1i2s73aakr10-a:5432/toyshop_hxxt
+ENV SPRING_DATASOURCE_USERNAME=admin
+ENV SPRING_DATASOURCE_PASSWORD=N8ogDTpsyM8bRQKLTqX6b1cULOGICOKC
+ENV SPRING_JPA_HIBERNATE_DDL_AUTO=update
 ENTRYPOINT ["java", "-jar", "app.jar", "--server.port=${PORT:8080}"]
