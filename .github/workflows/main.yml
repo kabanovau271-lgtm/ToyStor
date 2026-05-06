@@ -9,6 +9,21 @@ jobs:
 
   build-and-test:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: toyshop
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -20,30 +35,31 @@ jobs:
           cache: 'maven'
       - name: Build project
         run: mvn clean compile
+        env:
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/toyshop
+          SPRING_DATASOURCE_USERNAME: postgres
+          SPRING_DATASOURCE_PASSWORD: postgres
       - name: Run Tests
         run: mvn test
+        env:
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/toyshop
+          SPRING_DATASOURCE_USERNAME: postgres
+          SPRING_DATASOURCE_PASSWORD: postgres
 
   deploy:
     needs: build-and-test
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Install Railway CLI
-        run: npm install -g @railway/cli
-      - name: Deploy to Railway
-        run: railway up --service ${RAILWAY_SERVICE_NAME} -p ${RAILWAY_PROJECT_ID} --environment production
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-          RAILWAY_SERVICE_NAME: ${{ secrets.RAILWAY_SERVICE_NAME }}
-          RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
+      - name: Deploy to Render
+        run: |
+          curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}
 
   healthcheck:
     needs: deploy
     runs-on: ubuntu-latest
     steps:
       - name: Wait for service to start
-        run: sleep 60
+        run: sleep 90
       - name: Check Health Endpoint
         run: |
-          curl -vL https://${{ secrets.RAILWAY_SERVICE_NAME }}-production.up.railway.app/actuator/health || echo "Server is up"
+          curl -vL https://${{ secrets.RENDER_URL }}/actuator/health || echo "Server is up"
