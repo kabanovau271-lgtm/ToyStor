@@ -4,8 +4,9 @@ import com.example.ts.domain.Customer;
 import com.example.ts.repository.CustomerRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
@@ -15,6 +16,9 @@ public class CustomerServiceImpl implements CustomerService {
 
   @Override
   public Customer create(Customer customer) {
+    if (customerRepository.findByEmail(customer.getEmail()).isPresent()) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Пользователь с таким email уже существует");
+    }
     return customerRepository.save(customer);
   }
 
@@ -28,10 +32,9 @@ public class CustomerServiceImpl implements CustomerService {
     return customerRepository.findById(id)
         .orElseThrow(() -> new RuntimeException("Customer not found"));
   }
-  @Override
 
+  @Override
   public void deleteCustomer(Long id) {
     customerRepository.deleteById(id);
   }
-
 }
