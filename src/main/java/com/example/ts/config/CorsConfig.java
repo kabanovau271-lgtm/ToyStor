@@ -17,6 +17,7 @@ public class CorsConfig {
     config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
     config.setAllowedHeaders(List.of("*"));
     config.setAllowCredentials(true);
+    config.setAllowedOrigins(List.of("https://toyshop-c7ib.onrender.com", "http://localhost:5173", "http://localhost:5174"));
 
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
     source.registerCorsConfiguration("/**", config);

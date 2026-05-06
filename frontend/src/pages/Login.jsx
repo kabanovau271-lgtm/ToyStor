@@ -12,7 +12,7 @@ function Login({ onLogin }) {
   const handleLogin = async (e) => {
     e.preventDefault()
     try {
-      const res = await axios.post('http://localhost:8080/auth/login', {
+      const res = await axios.post('https://toyshop-c7ib.onrender.com/auth/login', {
         email,
         password,
       })
@@ -25,13 +25,12 @@ function Login({ onLogin }) {
   const handleRegister = async (e) => {
     e.preventDefault()
     try {
-      const res = await axios.post('http://localhost:8080/customers', {
+      const res = await axios.post('https://toyshop-c7ib.onrender.com/customers', {
         name,
         email,
         password,
         role: 'USER',
       })
-      // После регистрации сразу авторизуем
       onLogin({
         id: res.data.id,
         name: res.data.name,

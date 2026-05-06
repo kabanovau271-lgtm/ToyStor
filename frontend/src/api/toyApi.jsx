@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const API = axios.create({
-  baseURL: 'http://localhost:8080',
+  baseURL: 'https://toyshop-c7ib.onrender.com',
 })
 
 export const getToys = (page = 0, size = 10) =>
